@@ -20,7 +20,7 @@ export const createOpcaoProduto = (data) => api.post("/produtos/opcoes", data);
 export const deleteOpcaoProduto = (id_opcao) =>
   api.delete(`/produtos/opcoes/${id_opcao}`);
 
-// ✅ GET - grupos e itens do produto
+// GET - grupos e itens do produto
 export const getOpcoesProduto = (id_produto) =>
   api.get(`/produtos/cardapio/opcoes/${id_produto}`);
 

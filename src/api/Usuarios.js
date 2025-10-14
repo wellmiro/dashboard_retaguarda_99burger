@@ -8,7 +8,7 @@ export const getUsuario = (id_usuario) => api.get(`/usuario/${id_usuario}`);
 export const loginUsuario = (email, senha) =>
   api.post("/login", { email, senha });
 
-// Export default opcional
+// Export default
 export default {
   getUsuario,
   loginUsuario,
