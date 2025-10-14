@@ -1,8 +1,8 @@
 // src/api/Api.js
 import axios from "axios";
 
-// URL base da sua API (use HTTPS se disponível na AWS)
-const API_URL = process.env.REACT_APP_API_URL || "http://44.203.195.247:3000"; 
+// Base URL apontando para o proxy /api
+const API_URL = process.env.REACT_APP_API_URL || "/api";
 
 // Cria uma instância do axios
 const api = axios.create({
@@ -21,5 +21,9 @@ export const getDashboard = () => api.get("/dashboard");
 export const addPedido = (data) => api.post("/pedidos", data);
 export const updatePedido = (id, data) => api.put(`/pedidos/${id}`, data);
 export const deletePedido = (id) => api.delete(`/pedidos/${id}`);
+
+// Para login (chamando o proxy /api/login)
+export const loginUsuario = (email, senha) =>
+  api.post("/login", { email, senha });
 
 export default api;
