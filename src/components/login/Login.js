@@ -1,4 +1,3 @@
-// src/components/login/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUsuario } from "../../api/Usuarios";
@@ -14,7 +13,6 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Reseta erros
     setErroEmail("");
     setErroSenha("");
 
@@ -31,20 +29,15 @@ function Login() {
       const response = await loginUsuario(email, senha);
       const usuario = response.data;
 
-      // Salva id_usuario e nome
       localStorage.setItem("id_usuario", usuario.id_usuario);
       localStorage.setItem("nome_usuario", usuario.nome);
 
-      // Redireciona para dashboard
-      navigate("/");
+      navigate("/inicio");
     } catch (err) {
       if (err.response) {
         const msg = err.response.data.error || "Erro ao efetuar login";
-        // Mensagens específicas
         if (msg.includes("Usuário ou senha inválidos")) {
           setErroEmail("Email incorreto ou não cadastrado");
-          setErroSenha("Senha incorreta");
-        } else if (msg.includes("Usuário ou senha inválidos")) {
           setErroSenha("Senha incorreta");
         } else {
           setErroEmail(msg);
@@ -68,10 +61,9 @@ function Login() {
           Email:
           <input
             type="email"
-            name="email"
-            placeholder="nome@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="nome@exemplo.com"
           />
           {erroEmail && <span className="input-error">{erroEmail}</span>}
         </label>
@@ -80,10 +72,9 @@ function Login() {
           Senha:
           <input
             type="password"
-            name="password"
-            placeholder="********"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            placeholder="********"
           />
           {erroSenha && <span className="input-error">{erroSenha}</span>}
         </label>
