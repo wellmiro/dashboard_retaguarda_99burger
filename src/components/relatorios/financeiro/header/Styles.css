@@ -1,0 +1,64 @@
+/* Top bar (header) */
+.top-bar {
+  display: flex;
+  justify-content: space-between; /* título à esquerda, filtros à direita */
+  align-items: center;
+  margin: 0 0 20px 0;
+  gap: 15px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Título */
+.title-section h1 {
+  font-size: 28px;
+  color: #111827;
+  margin: 0;
+}
+
+/* Filtro (inputs, select, botão) */
+.filtro {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filtro input,
+.filtro select,
+.filtro button {
+  font-size: 16px;
+}
+
+.filtro input,
+.filtro select {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+.filtro button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filtro button:hover {
+  background-color: #2563eb;
+}
+
+/* Responsividade */
+@media(max-width: 768px) {
+  .top-bar {
+    flex-direction: column; /* empilha no mobile */
+    align-items: flex-start;
+  }
+
+  .filtro {
+    margin-top: 10px;
+  }
+}

@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  position: relative; /* necessário para o tooltip */
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 220px;
+  cursor: pointer; /* indica interação */
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Tooltip estilizado */
+/* Tooltip estilizado */
+.card::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 110%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6); /* mais transparente */
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.card h3 {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.card p {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #72767e;
+  line-height: 1.2;
+}
+
+/* Bordas coloridas dos cards */
+.card-total { border-left: 5px solid #10b981; }
+.card-pedidos { border-left: 5px solid #f59e0b; }
+.card-ticket { border-left: 5px solid #ef4444; }
+.card-produtos { border-left: 5px solid #3b82f6; }

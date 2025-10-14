@@ -1,0 +1,39 @@
+/* src/components/relatorios/financeiro/grafico/Styles.css */
+
+.financeiro-grafico-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chart-container h2 {
+  text-align: center;
+  color: #1e3a8a; /* azul escuro */
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+/* PIE CHART */
+.chart-container.pie {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container.pie canvas {
+  max-width: 400px;
+  max-height: 400px;
+  width: 100%;
+  height: auto;
+}

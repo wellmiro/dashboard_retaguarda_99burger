@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* CONTAINER PRINCIPAL */
+.main {
+  flex: 1 1 auto;
+  margin-left: 20px;
+  padding: 20px 24px;
+  font-family: 'Inter', sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* GRID PRINCIPAL (lista + gráficos) */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 500px;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+/* GRID DOS GRÁFICOS */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* CARD DOS GRÁFICOS */
+.chart-card {
+  height: 320px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* TOOLTIP DO GRÁFICO */
+.chartjs-tooltip {
+  background: rgba(0,0,0,0.7) !important;
+  color: white !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1080px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    height: 280px;
+  }
+}

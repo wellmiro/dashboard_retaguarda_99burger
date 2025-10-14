@@ -1,0 +1,12 @@
+/* src/components/gerenciar/performacegeral/Styles.css */
+.performace-geral-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.performace-label {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}

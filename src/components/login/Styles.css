@@ -1,0 +1,120 @@
+/* Estilos gerais */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    position: relative;
+    background: url('https://www.nutrimixassessoria.com.br/wp-content/uploads/2020/09/FICHA-TECNICA-PARA-HAMBURGUERIA-DICA.jpg') no-repeat center center;
+    background-size: cover;
+}
+
+/* Overlay semi-transparente para efeito profissional */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: 0;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 20px;
+    z-index: 1;
+    position: relative;
+}
+
+.ifood-logo {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.login-header h1 {
+    font-size: 2rem;
+    color: #ea1d2c;
+}
+
+.login-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Estilos do formulário */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+    padding: 25px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.login-form label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.login-form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-top: 5px;
+    width: 92%; /* Corrigido: Agora os inputs preencherão a largura do formulário. */
+}
+
+/* Botão de login */
+.login-form button {
+    padding: 12px;
+    background-color: #ea1d2c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* O botão já está com 100% de largura. */
+}
+
+.login-form button:hover {
+    background-color: #d11a28;
+}
+
+/* ...outros estilos... */
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #ea1d2c;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Mensagens de erro específicas abaixo de cada input */
+/* Mensagens de erro específicas abaixo de cada input */
+.input-error {
+    color: #ea1d2c;       /* vermelho suave, mesmo tom do botão */
+    font-size: 0.85rem;   /* um pouco menor que o input */
+    margin-top: 4px;
+    display: block;
+    font-weight: normal;  /* sem negrito */
+    font-family: Arial, sans-serif;
+}

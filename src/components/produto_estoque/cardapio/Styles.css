@@ -1,0 +1,278 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f6f6f6;
+  margin: 0;
+  padding: 0;
+}
+
+.cardapio-panel {
+  margin: 20px;
+}
+
+.section-title {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.categoria-section {
+  margin-bottom: 40px;
+}
+
+.categoria-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.categoria-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  width: calc(20% - 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #fff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.product-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.product-card h5 {
+  font-weight: 700;
+  margin: 4px 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.product-card p {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 2px 0;
+}
+
+.badge {
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-top: 5px;
+}
+
+.verde { background-color: #28a745; color: #fff; }
+.laranja { background-color: #fd7e14; color: #fff; }
+.vermelho { background-color: #dc3545; color: #fff; }
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+}
+
+.modal {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 700px;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.modal-img-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.modal-img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.edit-img-btn {
+  position: absolute;
+  top: 5px; right: 5px;
+  background: #fff; border-radius: 50%; border: none;
+  cursor: pointer; font-size: 18px; padding: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.modal-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full { grid-column: span 2; }
+
+.modal-form label {
+  font-weight: 600;
+  color: #222;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.modal-form input,
+.modal-form textarea {
+  width: 95%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn.salvar { background-color: #28a745; color: #fff; }
+.btn.apagar { background-color: #dc3545; color: #fff; }
+.btn.fechar { background-color: #6c757d; color: #fff; }
+
+.btn:hover { opacity: 0.85; }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.grupo-card {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  padding: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.grupo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.grupo-titulo {
+  cursor: pointer;
+}
+
+.grupo-opcoes {
+  margin-top: 10px;
+  padding-left: 15px;
+}
+
+.opcao-item {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Estilização do combobox (select) */
+.modal-form select {
+  width: 95%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  background-color: #fff;
+  color: #333;
+  appearance: none; /* Remove seta padrão do navegador */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 20,0 10,10"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
+
+.modal-form select:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+.modal-form option {
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+}
+
+/* Pequeno ajuste para responsividade */
+@media (max-width: 600px) {
+  .modal-form select {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 1200px) { .product-card { width: 31%; } }
+@media (max-width: 900px)  { .product-card { width: 48%; } }
+@media (max-width: 600px)  { .product-card { width: 100%; } }

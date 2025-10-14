@@ -1,0 +1,44 @@
+.performance-container {
+    padding: 20px;
+}
+
+.performance-section {
+    margin-bottom: 30px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.performance-section h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.performance-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.performance-card {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.performance-card h3 {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 0;
+}
+
+.performance-card p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ea1d2c;
+    margin: 5px 0;
+}

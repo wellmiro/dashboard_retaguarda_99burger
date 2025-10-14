@@ -1,0 +1,29 @@
+.grafico-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px; /* margem superior entre cards e gráficos */
+}
+
+.grafico-container {
+  width: 100%;          /* ocupa toda a largura do container */
+  background-color: #f0f8ff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* controla a altura do gráfico */
+.grafico-container canvas {
+  height: 180px !important; /* reduzido mais ainda */
+}
+
+/* responsividade */
+@media (min-width: 992px) {
+  .grafico-row {
+    flex-direction: row; /* lado a lado em telas grandes */
+  }
+  .grafico-container {
+    flex: 1 1 0;
+  }
+}

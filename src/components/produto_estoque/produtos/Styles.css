@@ -1,0 +1,307 @@
+/* ============================ */
+/* Wrapper do Produto */
+#produtoWrapper {
+  background: #fff;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  max-width: 1200;           /* suporta 4 cards com espaço */
+  margin: 0 15px 25px; /* 20px à esquerda e à direita */       /* centraliza horizontalmente */
+  padding-left: 15px;           /* margem interna mínima */
+  padding-right: 15px;
+  margin-right: 120px;
+  margin-bottom: 35px;
+}
+
+/* Margens horizontais responsivas */
+@media (min-width: 768px) {
+  #produtoWrapper {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #produtoWrapper {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* Título da seção */
+.section-title {
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 25px;
+  font-size: 1.6rem;
+}
+
+/* ============================ */
+/* Formulário */
+.form-produto {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1 1 calc(25% - 12px); /* 4 campos por linha */
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  flex: 1 1 100%;
+}
+
+.form-control,
+.form-select,
+textarea {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #d63a52;
+  box-shadow: 0 0 0 3px rgba(214,58,82,0.15);
+}
+
+.form-label {
+  font-weight: 600;
+  color: #444;
+}
+
+textarea.descricao {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ============================ */
+/* Preview da imagem */
+.product-image-preview {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-top: 5px;
+}
+
+/* ============================ */
+/* Botões Salvar e Limpar */
+.btn-primary {
+  background-color: #d63a52;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #b52b44;
+}
+
+.btn-secondary {
+  border-radius: 10px;
+  padding: 10px 18px;
+  background-color: #888; /* cinza escuro */
+  color: #fff;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #666;
+}
+
+/* ============================ */
+/* Cards de Produtos */
+#productCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 colunas sempre */
+  gap: 20px;
+}
+.product-card {
+  min-width: 0; /* garante que o card pode encolher */
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.product-card h5 {
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.product-card p {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.product-card .badge {
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* ============================ */
+/* Grupos de Opções */
+.option-group {
+  position: relative;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.option-header input.group-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  border: none;
+  background: none;
+  max-width: 200px;
+}
+
+.option-header input[type="number"] {
+  width: 120px;
+}
+
+.add-item-btn {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.items-list li {
+  background: #f6f6f6;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ============================ */
+/* Modal */
+.modal-bg {
+  display: none;
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.modal-content h4 {
+  margin-bottom: 15px;
+  color: #d63a52;
+  text-align: center;
+}
+
+/* ============================ */
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top:0; left:0; right:0; bottom:0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content:"";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #d63a52;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* ============================ */
+/* Responsividade */
+@media (max-width: 1200px) {
+  #productCards {
+    grid-template-columns: repeat(3, 1fr); /* 3 cards em telas menores */
+  }
+}
+
+@media (max-width: 900px) {
+  #productCards {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards */
+  }
+}
+
+@media (max-width: 600px) {
+  #productCards {
+    grid-template-columns: 1fr; /* 1 card */
+  }
+}

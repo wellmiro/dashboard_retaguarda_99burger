@@ -1,0 +1,77 @@
+.lista-vendas {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 40px;
+}
+
+.lista-vendas th,
+.lista-vendas td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 16px;
+}
+
+.lista-vendas th {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Centralizar colunas de Qtd e Valor */
+.lista-vendas th:nth-child(4),
+.lista-vendas th:nth-child(5),
+.lista-vendas th:nth-child(6),
+.lista-vendas td:nth-child(4),
+.lista-vendas td:nth-child(5),
+.lista-vendas td:nth-child(6) {
+  text-align: center;
+}
+
+/* Mês em negrito e centralizado */
+.lista-vendas td:first-child,
+.lista-vendas th:first-child {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Categoria com ícone */
+.lista-vendas td img {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* Bolinhas de performance */
+.bolinha {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+/* 4 níveis de performance */
+.bolinha.vermelho { background-color: #ef4444; }
+.bolinha.laranja { background-color: #f97316; }
+.bolinha.amarelo  { background-color: #facc15; }
+.bolinha.verde    { background-color: #10b981; }
+
+/* Tooltip simples */
+.bolinha[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transform: translate(-50%, -120%);
+  font-size: 12px;
+  pointer-events: none;
+}

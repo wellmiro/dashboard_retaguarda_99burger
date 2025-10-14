@@ -1,0 +1,35 @@
+.lista-financeiro {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; /* fonte maior */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.lista-financeiro th,
+.lista-financeiro td {
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.lista-financeiro th {
+  background-color: #3b82f6; /* azul escuro */
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.linha-azul {
+  background-color: #dbeafe; /* azul claro */
+}
+
+.linha-branca {
+  background-color: #ffffff;
+}
+
+.lista-financeiro tr:hover {
+  background-color: #93c5fd; /* azul hover */
+  transition: 0.2s;
+}

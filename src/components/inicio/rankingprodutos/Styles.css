@@ -1,0 +1,48 @@
+/* Styles.css */
+
+.ranking-produtos {
+  margin-top: 30px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.ranking-produtos h3 {
+  margin-bottom: 15px;
+  color: #007bff; /* título azul */
+}
+
+.produto {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.produto .nome {
+  width: 150px;
+  font-weight: 500;
+}
+
+.barra-bg {
+  flex: 1;
+  height: 20px;
+  background-color: #e9ecef; /* fundo cinza */
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 10px;
+}
+
+.barra {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s ease-in-out;
+  /* cor será definida dinamicamente via style inline do React */
+}
+
+.vendidos {
+  width: 40px;
+  text-align: right;
+  font-weight: 700; /* negrito */
+  color: #6cb2eb;  /* azul claro */
+}

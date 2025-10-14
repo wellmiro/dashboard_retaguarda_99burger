@@ -1,0 +1,293 @@
+/* src/components/produto_estoque/grupos/Styles.css */
+
+/* Geral e Título */
+.grupos-container {
+    padding: 20px;
+    background: #f7f8fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.titulo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* Formulário de Criação de Grupo */
+.criar-grupo-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #e9ecef;
+    border-radius: 8px;
+    flex-wrap: wrap; 
+    align-items: center;
+}
+
+.criar-grupo-wrapper input,
+.criar-grupo-wrapper select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    flex-grow: 1;
+    min-width: 100px; 
+}
+
+.criar-grupo-wrapper .input-nome-grupo {
+    min-width: 200px;
+}
+
+.criar-grupo-wrapper .input-max-escolhas {
+    width: 80px; 
+    flex-grow: 0;
+}
+
+.btn-criar-grupo.principal {
+    background-color: #007bff; 
+    color: white;
+    padding: 10px 15px;
+    font-weight: 600;
+    flex-grow: 1;
+    min-width: 120px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-criar-grupo.principal:hover {
+    background-color: #0056b3;
+}
+
+
+/* Listagem de Grupos (Cards) */
+.mensagem-vazia {
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+}
+
+.grupo-card {
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.grupo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    cursor: pointer; 
+    user-select: none;
+}
+
+.grupo-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #212529;
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.obrigatorio {
+    color: #dc3545; 
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.opcional {
+    color: #28a745; 
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.grupo-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+.toggle-btn:hover {
+    color: #000;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    height: 30px;
+}
+
+.btn-delete:hover {
+    opacity: 0.8;
+}
+
+/* Conteúdo do Grupo (Itens) */
+.grupo-content {
+    padding: 0;
+}
+
+.itens-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #ddd;
+}
+
+.item-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.item-linha:last-child {
+    border-bottom: none;
+}
+
+.item-linha:hover {
+    background: #fcfcfc;
+}
+
+.item-nome {
+    font-weight: 500;
+    color: #495057;
+}
+
+.item-valor {
+    font-weight: 700;
+    color: #007bff;
+    margin-left: 15px;
+}
+
+.mensagem-item-vazio {
+    color: #777;
+    font-style: italic;
+    justify-content: center;
+    padding: 15px;
+}
+
+/* Adicionar Item */
+.adicionar-item-wrapper {
+    padding: 15px;
+    background: #f0f2f5;
+    border-top: 1px solid #ddd;
+}
+
+.btn-adicionar-item {
+    background-color: #28a745; 
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.btn-adicionar-item:hover {
+    background-color: #1e7e34;
+}
+
+.btn-adicionar-item.cancelar {
+    background-color: #6c757d; 
+}
+
+.btn-adicionar-item.cancelar:hover {
+    background-color: #5a6268;
+}
+
+.form-adicionar-item {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.form-adicionar-item input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+    flex-grow: 1;
+    min-width: 100px;
+}
+
+.form-adicionar-item input[type="number"] {
+    width: 100px;
+    flex-grow: 0;
+}
+
+.btn-salvar-item {
+    background-color: #06d6a0;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    min-width: 100px;
+}
+
+.btn-salvar-item:hover {
+    background-color: #04b383;
+}
+
+/* Responsividade básica */
+@media (max-width: 600px) {
+    .criar-grupo-wrapper {
+        flex-direction: column;
+    }
+    .criar-grupo-wrapper input,
+    .criar-grupo-wrapper select,
+    .criar-grupo-wrapper button {
+        width: 100%;
+        min-width: unset;
+    }
+    .form-adicionar-item {
+        flex-direction: column;
+    }
+    .form-adicionar-item input,
+    .btn-salvar-item {
+        width: 100%;
+    }
+}

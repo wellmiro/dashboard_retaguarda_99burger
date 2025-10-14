@@ -1,0 +1,100 @@
+/* Lista Estoque */
+.lista-estoque {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 40px;
+}
+
+.lista-estoque th,
+.lista-estoque td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 15px;
+}
+
+.lista-estoque th {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Centralizar colunas de Qtd, Status, Preço e Valor */
+.lista-estoque th:nth-child(3),
+.lista-estoque th:nth-child(4),
+.lista-estoque th:nth-child(5),
+.lista-estoque th:nth-child(6),
+.lista-estoque td:nth-child(3),
+.lista-estoque td:nth-child(4),
+.lista-estoque td:nth-child(5),
+.lista-estoque td:nth-child(6) {
+  text-align: center;
+}
+
+/* Imagem produto */
+.product-img {
+  width: 50px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid #eef2f7;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.no-img {
+  width: 50px;
+  height: 34px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  border: 1px dashed #e6e9ef;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 11px;
+  margin-right: 8px;
+}
+
+/* Status dot */
+.status {
+  display: flex;            /* flex para centralizar */
+  justify-content: center;  /* horizontal */
+  align-items: center;      /* vertical */
+  width: 50px;
+  height: 100%;
+}
+
+.status-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* Cores de status */
+.status-dot.verde { background-color: #10b981; }
+.status-dot.laranja { background-color: #f59e0b; }
+.status-dot.vermelho { background-color: #ef4444; }
+
+/* Tooltip simples */
+.status-dot[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transform: translate(-50%, -120%);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.lista-estoque tfoot td.quantity,
+.lista-estoque tfoot td.total-value {
+  font-weight: 700; /* negrito */
+}

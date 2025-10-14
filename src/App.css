@@ -1,0 +1,99 @@
+/* Reset e body */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* Wrapper geral */
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar fixo */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #252629;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  box-sizing: border-box;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+  padding: 20px 10px;
+}
+
+/* Área de conteúdo */
+.content-container {
+  margin-left: 220px; /* alinhado com sidebar expandido */
+  flex: 1;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+  box-sizing: border-box;
+}
+
+.content-container.collapsed {
+  margin-left: 70px; /* alinhado com sidebar encolhido */
+}
+
+/* Dashboard main area */
+.dashboard-main-area {
+  width: 100%;
+  height: 100%;
+  padding: 0; /* sem margem extra */
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Cards e seções internas */
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.card {
+  background-color: #fff;
+  flex: 1 1 180px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Tabelas, ranking, etc */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.ranking-produtos {
+  margin-top: 30px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}

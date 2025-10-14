@@ -1,0 +1,64 @@
+/* Estilos principais do container Estoque */
+.main {
+  flex: 1 1 auto;
+  margin-left: 20px;
+  padding: 20px 24px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Controles de filtro/pesquisa */
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Grid geral da lista e gráficos */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 520px; /* Lista à esquerda, gráficos à direita */
+  gap: 20px;
+  margin-top: 16px;
+}
+
+/* Container de gráficos */
+.charts-container {
+  display: flex;
+  flex-direction: column; /* default: um em cima do outro em telas pequenas */
+  gap: 20px;
+}
+
+/* Cada gráfico individual */
+.chart-card {
+  height: 320px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsividade */
+@media (max-width: 1080px) {
+  .grid {
+    grid-template-columns: 1fr; /* lista e gráficos empilham */
+  }
+  .charts-container {
+    flex-direction: column;
+  }
+  .chart-card {
+    height: 280px;
+  }
+}
+
+/* Tooltip Chart.js personalizado */
+.chartjs-tooltip {
+  background: rgba(0,0,0,0.7) !important;
+  color: white !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+}

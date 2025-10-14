@@ -1,0 +1,57 @@
+.cards-row {
+  display: flex;
+  flex-wrap: wrap; /* permite quebrar linha em telas menores */
+  gap: 15px; /* espaço entre os cards */
+  margin-bottom: 30px; /* separação do próximo componente */
+  padding-left: 15px; /* pequena folga da esquerda */
+  padding-right: 15px; /* pequena folga da direita */
+}
+
+/* Cada card ocupa 25% menos o espaço da sidebar e gap */
+.metric-card {
+  flex: 1 1 calc((100% - 60px - 250px) / 4); /* 60px de gap total e 250px de sidebar */
+  min-width: 200px; /* não deixa encolher demais */
+  color: #fff;
+  padding: 20px 15px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  word-break: break-word;
+}
+
+/* ícone do card */
+.metric-card i {
+  margin-bottom: 5px;
+  font-size: 24px;
+}
+
+/* tamanho do valor maior */
+.metric-card h4 {
+  font-size: 26px;
+  font-weight: 400; /* removeu o negrito */
+  margin: 0;
+}
+
+/* Mantém cores e estilos atuais */
+.bg-primary { background-color: #007BFF !important; color: #fff !important; }
+.bg-success { background-color: #28a745 !important; color: #fff !important; }
+.bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
+.bg-info { background-color: #17a2b8 !important; color: #fff !important; }
+
+/* Responsivo para tablets */
+@media (max-width: 1024px) {
+  .metric-card {
+    flex: 1 1 calc((100% - 45px) / 2); /* 2 cards por linha */
+  }
+}
+
+/* Responsivo para celulares */
+@media (max-width: 600px) {
+  .metric-card {
+    flex: 1 1 100%; /* 1 card por linha */
+  }
+}
