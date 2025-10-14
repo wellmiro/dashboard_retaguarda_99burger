@@ -1,8 +1,8 @@
 // src/api/Api.js
 import axios from "axios";
 
-// URL base da sua API (pode ser configurada via variável de ambiente)
-const API_URL = process.env.REACT_APP_API_URL || "https://dashboard-retaguarda-99burger.vercel.app";
+// URL base da sua API (use HTTPS se disponível na AWS)
+const API_URL = process.env.REACT_APP_API_URL || "http://44.203.195.247:3000"; 
 
 // Cria uma instância do axios
 const api = axios.create({
