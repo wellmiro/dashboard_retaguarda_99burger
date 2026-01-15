@@ -7,7 +7,7 @@ import axios from "axios";
  * não bloqueie a resposta JSON com a página de aviso do ngrok.
  */
 const api = axios.create({
-  baseURL: "https://nonautobiographical-uncapitulating-henry.ngrok-free.dev", 
+  baseURL: "https://api-99burger.onrender.com", 
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
