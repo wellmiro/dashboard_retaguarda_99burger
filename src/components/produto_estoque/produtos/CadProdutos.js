@@ -1,186 +1,203 @@
-// src/components/produto_estoque/produtos/CadProdutos.js
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Styles.css';
 import { createProduto } from '../../../api/Produtos';
+import { getCategorias } from '../../../api/Categorias';
+
+const INITIAL_FORM_DATA = {
+    nome: '',
+    preco: '',
+    categoria: '', // id_categoria
+    urlFoto: '',
+    descricao: '',
+    qtdMax: '',
+    qtdMin: '',
+};
 
 const CadProdutos = ({ onUpdate }) => {
-  const [nome, setNome] = useState('');
-  const [preco, setPreco] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [urlFoto, setUrlFoto] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [qtdMax, setQtdMax] = useState('');
-  const [qtdMin, setQtdMin] = useState('');
+    const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+    const [categorias, setCategorias] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // Novo estado de loading
 
-  const categorias = [
-    'Ofertas',
-    'Burgers',
-    'Dogs',
-    'Bebidas',
-    'Pizzas',
-    'Pastel',
-    'Pastel Doces',
-    'Pizzas Doces'
-  ];
+    const handleInputChange = useCallback((e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    // 1. Função de carregamento com useCallback
+    const fetchCategorias = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const res = await getCategorias();
+            // Garante que res.data é um array antes de mapear
+            const dataArray = Array.isArray(res.data) ? res.data : [];
+            const lista = dataArray.map(c => ({ id: c.id_categoria, nome: c.descricao }));
+            setCategorias(lista);
+        } catch (err) {
+            console.error("Erro ao carregar categorias:", err);
+            setCategorias([]);
+            // Opcional: Mostrar uma mensagem de erro ao usuário
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
-    if (!nome || !preco || !categoria) {
-      alert("Preencha os campos obrigatórios: Nome, Preço e Categoria");
-      return;
-    }
+    useEffect(() => {
+        fetchCategorias();
+    }, [fetchCategorias]);
 
-    try {
-      const produtoData = {
-        nome,
-        descricao,
-        preco: parseFloat(preco) < 0 ? 0 : parseFloat(preco),
-        url_foto: urlFoto,
-        qtd: 0,
-        qtd_max: qtdMax ? parseInt(qtdMax) : 0,
-        qtd_min: qtdMin ? parseInt(qtdMin) : 0,
-        id_categoria: parseInt(categoria)
-      };
+    const handleClear = useCallback(() => {
+        setFormData(INITIAL_FORM_DATA);
+    }, []);
 
-      // Chama a API para cadastrar
-      await createProduto(produtoData);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-      // Limpar campos
-      handleClear();
+        const { nome, preco, categoria, urlFoto, descricao, qtdMax, qtdMin } = formData;
 
-      // Mostrar alerta de sucesso
-      alert(`Produto "${nome}" cadastrado com sucesso!`);
+        if (!nome || !preco || !categoria) {
+            alert("Preencha os campos obrigatórios: Nome, Preço e Categoria");
+            return;
+        }
 
-      // Atualizar Cardápio
-      if (onUpdate) onUpdate();
+        try {
+            const produtoData = {
+                nome,
+                descricao,
+                preco: parseFloat(preco) < 0 ? 0 : parseFloat(preco), 
+                url_foto: urlFoto,
+                qtd: 0,
+                qtd_max: qtdMax ? parseInt(qtdMax) : 0, 
+                qtd_min: qtdMin ? parseInt(qtdMin) : 0, 
+                id_categoria: parseInt(categoria)
+            };
 
-    } catch (err) {
-      console.error("Erro ao cadastrar produto:", err);
-      alert("Erro ao cadastrar produto!");
-    }
-  };
+            await createProduto(produtoData);
+            handleClear();
+            alert(`Produto "${nome}" cadastrado com sucesso!`);
+            if (onUpdate) onUpdate();
+        } catch (err) {
+            console.error("Erro ao cadastrar produto:", err.response?.data || err);
+            alert(`Erro ao cadastrar produto! Detalhe: ${err.response?.data?.message || "Verifique o console."}`);
+        }
+    };
 
-  const handleClear = () => {
-    setNome('');
-    setPreco('');
-    setCategoria('');
-    setUrlFoto('');
-    setDescricao('');
-    setQtdMax('');
-    setQtdMin('');
-  };
+    const { nome, preco, categoria, urlFoto, descricao, qtdMax, qtdMin } = formData; 
 
-  return (
-    <div id="produtoWrapper">
-      <h2 className="section-title">Cadastro de Produto</h2>
+    return (
+        <div id="produtoWrapper">
+            <h2 className="section-title">Cadastro de Produto</h2>
+            <form className="form-produto" onSubmit={handleSubmit}>
 
-      <form className="form-produto" onSubmit={handleSubmit}>
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Categoria*</label>
-            <select
-              className="form-select"
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-            >
-              <option value="">Selecione a categoria</option>
-              {categorias.map((cat, idx) => (
-                <option key={idx} value={idx + 1}>{cat}</option>
-              ))}
-            </select>
-          </div>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label className="form-label">Categoria* {isLoading && ' (Carregando...)'}</label>
+                        <select
+                            className="form-select"
+                            name="categoria" 
+                            value={categoria}
+                            onChange={handleInputChange}
+                            disabled={isLoading} // Desabilita enquanto carrega
+                        >
+                            <option value="">Selecione a categoria</option>
+                            {/* Garante que `categorias` é um array antes de mapear */}
+                            {categorias.map(cat => ( 
+                                <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                            ))}
+                        </select>
+                    </div>
 
-          <div className="form-group">
-            <label className="form-label">Nome do Produto*</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Nome do produto"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-            />
-          </div>
+                    <div className="form-group">
+                        <label className="form-label">Nome do Produto*</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Nome do produto"
+                            name="nome" 
+                            value={nome}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
+                
+                {/* ... (o restante do JSX do formulário permanece o mesmo) ... */}
+                <div className="form-row">
+                    <div className="form-group">
+                        <label className="form-label">Qtd Máx</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Quantidade máxima"
+                            name="qtdMax" 
+                            value={qtdMax}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">Qtd Min</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            placeholder="Quantidade mínima"
+                            name="qtdMin" 
+                            value={qtdMin}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label className="form-label">Preço*</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            placeholder="R$"
+                            name="preco" 
+                            value={preco}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">URL da Foto</label>
+                        <input
+                            type="url"
+                            className="form-control"
+                            placeholder="https://..."
+                            name="urlFoto" 
+                            value={urlFoto}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+
+                    {urlFoto && (
+                        <div className="form-group preview">
+                            <label className="form-label">Preview</label>
+                            <img src={urlFoto} alt="Preview" className="product-image-preview" />
+                        </div>
+                    )}
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group full-width">
+                        <label className="form-label">Descrição</label>
+                        <textarea
+                            className="form-control descricao"
+                            placeholder="Descrição do produto"
+                            name="descricao" 
+                            value={descricao}
+                            onChange={handleInputChange}
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div className="form-actions">
+                    <button type="submit" className="btn salvar">Cadastrar Produto</button>
+                    <button type="button" className="btn btn-secondary" onClick={handleClear}>Limpar</button>
+                </div>
+            </form>
         </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Qtd Máx</label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Quantidade máxima"
-              value={qtdMax}
-              onChange={(e) => setQtdMax(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Qtd Min</label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Quantidade mínima"
-              value={qtdMin}
-              onChange={(e) => setQtdMin(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label className="form-label">Preço*</label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="R$"
-              value={preco}
-              onChange={(e) => setPreco(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">URL da Foto</label>
-            <input
-              type="url"
-              className="form-control"
-              placeholder="https://..."
-              value={urlFoto}
-              onChange={(e) => setUrlFoto(e.target.value)}
-            />
-          </div>
-
-          {urlFoto && (
-            <div className="form-group preview">
-              <label className="form-label">Preview</label>
-              <img
-                src={urlFoto}
-                alt="Preview"
-                className="product-image-preview"
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="form-row">
-          <div className="form-group full-width">
-            <label className="form-label">Descrição</label>
-            <textarea
-              className="form-control descricao"
-              placeholder="Descrição do produto"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-            ></textarea>
-          </div>
-        </div>
-
-        <div className="form-actions">
-          <button type="submit" className="btn salvar">Cadastrar Produto</button>
-          <button type="button" className="btn btn-secondary" onClick={handleClear}>Limpar</button>
-        </div>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default CadProdutos;

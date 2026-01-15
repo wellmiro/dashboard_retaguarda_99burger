@@ -1,29 +1,56 @@
-/* Lista Estoque */
+:root {
+  --primary-color: #f00;
+  --secondary-color: #3b82f6;
+  --card-bg: #fff;
+  --text-color: #333;
+  --label-color: #757575;
+  --light-gray: #f9f9f9;
+  --border-color: #eee;
+}
+
+/* --- REGRAS DE DESKTOP (Layout de Tabela Padrão) --- */
+
+.lista-container {
+  width: 100%;
+}
+
 .lista-estoque {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   margin-bottom: 40px;
+  font-size: 14px;
+  color: var(--text-color);
+  table-layout: auto;
+  display: table; 
 }
 
-.lista-estoque th,
-.lista-estoque td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
+.lista-estoque tr {
+    display: table-row;
+}
+
+.lista-estoque th, .lista-estoque td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
-  font-size: 15px;
+  white-space: normal;
+  word-break: break-word;
+  display: table-cell; 
 }
 
-.lista-estoque th {
-  background-color: #3b82f6;
+.lista-estoque thead th {
+  background-color: var(--secondary-color);
   color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-bottom: none;
 }
 
-/* Centralizar colunas de Qtd, Status, Preço e Valor */
+/* Centralização para Quantidade, Status, Preço Unit e Valor Total */
 .lista-estoque th:nth-child(3),
 .lista-estoque th:nth-child(4),
 .lista-estoque th:nth-child(5),
@@ -34,67 +61,259 @@
 .lista-estoque td:nth-child(6) {
   text-align: center;
 }
+/* O Status (coluna 4) precisa de flexbox para centralizar a bolinha no desktop */
+.lista-estoque td:nth-child(4) { 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-/* Imagem produto */
+.lista-estoque tbody tr:nth-child(even) { background-color: var(--light-gray); }
+.lista-estoque tbody tr:hover { background-color: #f0f0f0; transition: 0.3s; }
+
+.lista-estoque td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  min-width: 150px;
+}
+
 .product-img {
-  width: 50px;
-  height: 34px;
-  object-fit: contain;
-  border-radius: 6px;
-  border: 1px solid #eef2f7;
-  margin-right: 8px;
-  vertical-align: middle;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .no-img {
-  width: 50px;
-  height: 34px;
-  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   background: #f3f4f6;
   border: 1px dashed #e6e9ef;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #9ca3af;
-  font-size: 11px;
-  margin-right: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
-/* Status dot */
-.status {
-  display: flex;            /* flex para centralizar */
-  justify-content: center;  /* horizontal */
-  align-items: center;      /* vertical */
-  width: 50px;
-  height: 100%;
+.status-dot { 
+    width: 14px; 
+    height: 14px; 
+    border-radius: 50%; 
+    box-shadow: 0 0 4px rgba(0,0,0,0.1); 
+    display: inline-block;
+    flex-shrink: 0; 
+}
+.status-dot.verde { background-color: #2ecc71; }
+.status-dot.laranja { background-color: #f39c12; }
+.status-dot.vermelho { background-color: #e74c3c; }
+
+.lista-estoque td.price-cell, .lista-estoque td.total-value {
+  font-weight: 600;
+  color: var(--text-color);
+}
+.lista-estoque td.total-value { color: var(--primary-color); }
+
+.lista-estoque tfoot tr { background-color: var(--light-gray); border-top: 2px solid var(--primary-color); }
+.lista-estoque tfoot td { font-size: 16px; padding: 15px 10px; border-bottom: none; }
+.lista-estoque tfoot td.bold { font-weight: 700; color: #1a1a1a; }
+.lista-estoque tfoot td.final-total-value-cell { color: var(--primary-color); font-size: 18px; }
+
+/* Tablet */
+@media (max-width: 768px){
+  .lista-estoque th.hide-on-mobile, .lista-estoque td.hide-on-mobile { display: none; }
+  .lista-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .lista-estoque { min-width: 500px; box-shadow: none; }
 }
 
-.status-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-}
+/* --- MOBILE (max-width: 580px) - LAYOUT DE CARTÃO (Grid) --- */
+@media (max-width: 580px){
+  .lista-container { overflow-x: hidden; padding: 0 10px; }
+  .lista-estoque { min-width: 100%; border-radius: 0; box-shadow: none; }
+  
+  /* CONVERTE PARA LAYOUT DE CARTÃO NO MOBILE */
+  .lista-estoque, .lista-estoque thead, .lista-estoque tbody, .lista-estoque tfoot { 
+    display: block; 
+    width: 100%; 
+  }
+  .lista-estoque thead { display: none; }
 
-/* Cores de status */
-.status-dot.verde { background-color: #10b981; }
-.status-dot.laranja { background-color: #f59e0b; }
-.status-dot.vermelho { background-color: #ef4444; }
+  .lista-estoque tr.mobile-card {
+    display: flex; 
+    flex-direction: column;
+    border: none; 
+    margin-bottom: 15px; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    padding: 0; 
+    background: var(--card-bg); 
+    box-shadow: 0 4px 4px rgba(0,0,0,0.1); 
+  }
+  
+  .lista-estoque td {
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+    padding: 0; 
+    display: block;
+  }
+  .lista-estoque td:not(.product-header-cell) {
+      padding: 12px 0;
+  }
+  .lista-estoque tr.mobile-card td:last-child {
+      border-bottom: none;
+  }
+  
+  /* Células que DEVEM ser tratadas no Grid */
+  .lista-estoque td.hide-on-mobile {
+      display: block; 
+  }
+  
+  /* Célula Produto (Cabeçalho) */
+  .lista-estoque td.product-header-cell {
+    display: flex;
+    align-items: center; 
+    gap: 12px; 
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 25px; 
+  }
+  
+  .lista-estoque td.product-header-cell .product-img,
+  .lista-estoque td.product-header-cell .no-img {
+      width: 40px; 
+      height: 40px; 
+      flex-shrink: 0;
+  }
 
-/* Tooltip simples */
-.status-dot[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  transform: translate(-50%, -120%);
-  font-size: 12px;
-  pointer-events: none;
-}
+  /* Células de 2 Colunas (Grid Layout) */
+  .lista-estoque td.grid-cell {
+    display: grid;
+    grid-template-columns: auto 1fr; 
+    align-items: center;
+    text-align: right; 
+    font-weight: 600;
+    gap: 12px; /* Aumentado o gap para mais espaço entre rótulo e valor */
+  }
+  
+  /* Rótulo: Fica na coluna 'auto' e pega o padding esquerdo */
+  .lista-estoque td.grid-cell:before {
+    content: attr(data-label) ":";
+    text-align: left; 
+    font-weight: 500;
+    color: var(--label-color);
+    padding-left: 25px; /* Margem esquerda para os rótulos */
+    
+    position: static; 
+    transform: none;
+    padding-right: 5px; /* Pequeno espaço entre o rótulo e o valor (antes do gap) */
+  }
 
-.lista-estoque tfoot td.quantity,
-.lista-estoque tfoot td.total-value {
-  font-weight: 700; /* negrito */
+  /* Aplica o padding direito a TODOS os SPANS dentro das células Grid, incluindo a bolinha */
+  .lista-estoque td.grid-cell > span { 
+      padding-right: 25px; /* Margem direita para os valores */
+      white-space: nowrap; 
+      overflow: visible; 
+  }
+
+  /* Ajuste específico para a bolinha de status, que já é um span */
+  .lista-estoque td.status-cell > .status-dot {
+      /* Garante que a bolinha mantenha seu tamanho e não seja esticada */
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      display: inline-block; /* Mantém o display original da bolinha */
+      
+      /* A célula (td.status-cell) é um Grid, e o span.status-dot é o conteúdo da segunda coluna (1fr) */
+      /* O 'justify-self: end' do Grid fará o trabalho de alinhar à direita */
+      /* Nenhuma regra adicional de flexbox ou margin-left: auto no span é necessária aqui */
+  }
+  
+  /* Categoria (Alinhamento ao topo, se quebrar) */
+  .lista-estoque td.category-cell {
+     align-items: start; 
+  }
+  .lista-estoque td.category-cell:before {
+    align-self: start; 
+    padding-top: 5px; 
+  }
+
+  .lista-estoque td.total-value {
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .lista-estoque td.total-value:before {
+    color: var(--label-color); 
+    font-weight: 500;
+  }
+  
+  /* ------------------------------------------- */
+  /* --- AJUSTES DO RODAPÉ (TFOOT) --- */
+  
+  .lista-estoque tfoot {
+    margin-top: 10px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); 
+    display: block; 
+  }
+  
+  .lista-estoque tfoot tr.mobile-card {
+    display: block; 
+  }
+  
+  .lista-estoque tfoot td {
+      display: none;
+  }
+  .lista-estoque tfoot td.total-quantity-cell,
+  .lista-estoque tfoot td.final-total-value-cell {
+    display: grid;
+    grid-template-columns: auto 1fr; 
+    padding: 0; 
+    text-align: right;
+    border-bottom: none;
+    font-weight: 700;
+    color: var(--text-color);
+    gap: 8px; /* Ajuste o gap aqui também se quiser mais espaço no rodapé mobile */
+  }
+
+  .lista-estoque tfoot td.total-quantity-cell:before,
+  .lista-estoque tfoot td.final-total-value-cell:before {
+    content: attr(data-label) ":"; 
+    text-align: left;
+    font-weight: 700; 
+    color: var(--text-color);
+    grid-column: 1 / 2; 
+    padding-left: 25px; /* Margem esquerda do rodapé */
+    padding-right: 5px;
+    padding-top: 15px;
+  }
+
+  .lista-estoque tfoot td.final-total-value-cell {
+    font-size: 16px;
+    border-top: 1px solid var(--border-color);
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+  
+  .lista-estoque tfoot td.final-total-value-cell > span { /* Aplica ao span do total */
+      padding-right: 25px; /* Margem direita do rodapé */
+      padding-top: 15px;
+      padding-bottom: 15px;
+  }
+  
+  .lista-estoque tfoot td.total-quantity-cell > span { /* Aplica ao span da quantidade total */
+      padding-right: 25px; /* Margem direita do rodapé */
+      padding-top: 12px;
+      padding-bottom: 12px;
+  }
 }

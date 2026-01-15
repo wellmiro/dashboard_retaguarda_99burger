@@ -1,147 +1,213 @@
-/* Reset */
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+:root {
+  /* Cores Modernas */
+  --sidebar-bg: #1f2937; /* Dark Slate Gray */
+  --sidebar-hover: #374151;
+  --sidebar-active: #10b981; /* Esmeralda */
+  --text-primary: #f9fafb; /* Off-White */
+  --text-secondary: #9ca3af; /* Light Gray */
+  --logout-bg: #ef4444; /* Vermelho mais suave */
+  --header-height: 60px;
 }
 
-/* Sidebar */
+/* --- BASE E LAYOUT --- */
 .sidebar {
-  width: 220px; /* largura normal */
-  background-color: #1c1f26;
-  padding: 20px 10px;
+  width: 250px; /* Levemente mais largo */
+  background: var(--sidebar-bg);
+  color: var(--text-primary);
+  padding: 0; /* Remove padding do container principal, move para o nav */
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, transform 0.3s ease;
   min-height: 100vh;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar.collapsed {
-  width: 70px;
+.sidebar.collapsed { width: 80px; }
+
+/* --- HEADER E TOGGLE --- */
+.sidebar-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-bottom: 1px solid #2e3745;
 }
+
+.logo-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sidebar-active);
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .logo-text { opacity: 0; width: 0; }
 
 .toggle-button {
   cursor: pointer;
-  font-size: 1.4rem;
-  color: #fff;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: flex-end;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+  padding: 8px;
+  border-radius: 6px;
 }
+.toggle-button:hover { color: var(--text-primary); background-color: var(--sidebar-hover); }
 
-.sidebar.collapsed .toggle-button {
-  justify-content: center;
+.sidebar.collapsed .toggle-button { justify-content: center; margin-right: 0; }
+.sidebar:not(.collapsed) .toggle-button { margin-left: auto; } /* Alinha à direita no modo expandido */
+
+
+/* --- NAVEGAÇÃO E LINKS --- */
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 20px 10px;
+    overflow-y: auto;
 }
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav ul > li { margin-bottom: 8px; }
 
-.sidebar-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar-nav ul > li {
-  margin-bottom: 12px;
-}
-
-.sidebar-nav a {
+.mobile-link {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 12px 15px;
   text-decoration: none;
-  color: #b0b7c3;
+  color: var(--text-secondary);
   font-weight: 500;
-  border-radius: 4px;
-  overflow: visible;
-  white-space: normal;
-  word-break: break-word;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 0.92rem;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
 }
 
-.sidebar-nav a:hover,
-.sidebar-nav a.active {
-  background-color: #2e3138;
-  color: #fff;
+/* Efeito de Link */
+.mobile-link:hover { background-color: var(--sidebar-hover); color: var(--text-primary); }
+.mobile-link.active {
+    background: var(--sidebar-active);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3); /* Sombra da cor ativa */
 }
+.mobile-link.active .icon { color: #fff; }
 
-.icon {
-  font-size: 1.1rem;
-  min-width: 30px;
-}
+.icon { font-size: 1.1rem; min-width: 35px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+.sidebar.collapsed .text { display: none; }
+.sidebar.collapsed .icon { min-width: auto; } /* Centraliza o ícone no modo colapsado */
 
-.sidebar.collapsed .text,
-.sidebar.collapsed .arrow {
-  display: none;
+/* --- SUBMENU E DROPDOWN --- */
+.menu-item-with-arrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
 }
+.menu-item-with-arrow:hover { background-color: var(--sidebar-hover); color: var(--text-primary); }
+
+.menu-item { display: flex; align-items: center; }
+
+/* Indicador de Submenu */
+.arrow { 
+    font-size: 0.75rem; 
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    margin-left: 10px; 
+}
+.arrow.open { transform: rotate(-180deg); }
+.sidebar.collapsed .arrow { display: none; } /* Oculta a seta no modo colapsado */
 
 .submenu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+}
+.submenu.open { max-height: 500px; }
+
+.submenu li .mobile-link { 
+    padding: 8px 15px 8px 50px; /* Recuo para sub-item */
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.submenu li .mobile-link:hover { background-color: #3b4556; }
+.submenu li .mobile-link.active { background: var(--sidebar-active); box-shadow: none; }
+.submenu li .mobile-link .icon { min-width: 25px; } /* Ajusta ícones menores */
+
+/* --- LOGOUT --- */
+.logout-section {
+    margin-top: 20px;
+    padding: 0 10px;
 }
 
-.submenu.open {
-  max-height: 500px;
-  background-color: #272a31;
-  border-radius: 4px;
-  padding: 10px 0;
+.logout-link { 
+    background-color: var(--logout-bg); 
+    color: #fff; 
+    font-weight: 600; 
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3); 
 }
+.logout-link:hover { background-color: #dc2626; }
+.logout-link .icon { color: #fff; }
+.sidebar.collapsed .logout-link { padding: 12px 0; justify-content: center; }
 
-.submenu li {
-  margin-bottom: 8px;
-}
 
-.submenu li a {
-  padding: 8px 12px 8px 40px;
-  color: #b0b7c3;
-  white-space: normal;
-  word-break: break-word;
-  font-size: 0.92rem;
-}
+/* --- RESPONSIVIDADE (MOBILE) --- */
+@media (max-width: 768px) {
+  /* BARRA SUPERIOR MOBILE (Toggle) */
+  .mobile-top-bar { 
+    display: block; 
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+  }
+  .mobile-toggle-btn {
+    background: #1f2937;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
 
-.menu-item-with-arrow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  color: #b0b7c3;
-  font-weight: 500;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 0.92rem;
-}
+  /* SIDEBAR MOBILE */
+  .sidebar { 
+    transform: translateX(-100%); 
+    width: 250px; 
+    height: 100%; /* Ocupa toda a altura da tela */
+    z-index: 1050; /* Acima do overlay */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar .toggle-button { display: none; } /* Oculta o toggle de desktop */
+  .sidebar-header .logo-text { opacity: 1; width: auto; } /* Mostra o logo no mobile */
+  
+  /* O sidebar não colapsa no mobile */
+  .sidebar.collapsed { width: 250px; } 
 
-.menu-item-with-arrow:hover {
-  background-color: #2e3138;
-  color: #fff;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-}
-
-/* 🔴 Estilo especial para o botão Desconectar */
-.logout-link {
-  color: #c5c3c3 !important;   /* vermelho */
-  font-weight: 600;
-}
-
-.logout-link .icon {
-  color: #bdbcbc !important;   /* ícone vermelho */
-}
-
-.logout-link:hover {
-  background-color: #c0392b !important; /* vermelho escuro no hover */
-  color: #fff !important;
-}
-
-.logout-link:hover .icon {
-  color: #fff !important; /* ícone fica branco no hover */
+  .sidebar-overlay {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1040;
+  }
 }

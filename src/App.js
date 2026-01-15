@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Sidebar from './components/sidebar/Sidebar';
-import Inicio from './components/inicio/Inicio';
-import PerformaceGeral from './components/gerenciar/performacegeral/PerformaceGeral';
-import Faturas from './components/gerenciar/faturas/Faturas';
-import Vendas from './components/relatorios/vendas/Vendas';
-import Estoque from './components/relatorios/estoque/Estoque';
-import Financeiro from './components/relatorios/financeiro/Financeiro';
-import ProdutoEstoque from './components/produto_estoque/ProdutoEstoque';
-import Login from './components/login/Login';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Sidebar from "./components/sidebar/Sidebar";
+import Inicio from "./components/inicio/Inicio";
+import PerformaceGeral from "./components/gerenciar/performacegeral/PerformaceGeral";
+import Faturas from "./components/gerenciar/faturas/Faturas";
+import Vendas from "./components/relatorios/vendas/Vendas";
+import Estoque from "./components/relatorios/estoque/Estoque";
+import Financeiro from "./components/relatorios/financeiro/Financeiro";
+import ProdutoEstoque from "./components/produto_estoque/ProdutoEstoque";
+import Login from "./components/login/Login";
 
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import './App.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "./App.css";
 
 function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -37,8 +37,8 @@ function App() {
           element={
             isLoggedIn ? (
               <div className="dashboard-wrapper">
-                <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-                <div className={`content-container ${isCollapsed ? 'collapsed' : ''}`}>
+                <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+                <div className={`content-container ${isCollapsed ? "collapsed" : ""}`}>
                   <Routes>
                     <Route path="/inicio" element={<Inicio />} />
                     <Route path="/performace" element={<PerformaceGeral />} />

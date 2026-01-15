@@ -1,7 +1,33 @@
 .chart-container {
+  width: 100%;
+  max-width: 100%;
+  min-height: 300px; /* altura mínima para o gráfico */
   background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* responsividade */
+@media (max-width: 1024px) {
+  .chart-container { padding: 12px; min-height: 250px; }
+}
+
+@media (max-width: 768px) {
+  .chart-container { padding: 10px; min-height: 220px; }
+}
+
+@media (max-width: 420px) {
+  .chart-container { padding: 8px; min-height: 200px; }
 }

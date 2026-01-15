@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "./header/Header";
 import Cards from "./cards/Cards";
 import Grafico from "./grafico/Grafico";
@@ -17,11 +17,23 @@ function Vendas() {
   };
 
   return (
-    <div className="vendas-container">
+    <div className="vendas-container relatorios-container">
       <Header filtroData={filtroData} onFiltroChange={handleFiltroChange} />
-      <Cards filtroData={filtroData} />
-      <Grafico filtroData={filtroData} />
-      <Lista filtroData={filtroData} />
+
+      {/* Cards de resumo */}
+      <div className="vendas-cards">
+        <Cards filtroData={filtroData} />
+      </div>
+
+      {/* Gráfico de vendas */}
+      <div className="vendas-grafico">
+        <Grafico filtroData={filtroData} />
+      </div>
+
+      {/* Lista / tabela de vendas */}
+      <div className="vendas-lista">
+        <Lista filtroData={filtroData} />
+      </div>
     </div>
   );
 }

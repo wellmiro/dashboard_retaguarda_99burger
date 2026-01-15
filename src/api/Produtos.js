@@ -2,7 +2,7 @@
 import api from "./Api";
 
 // GET - todos os produtos
-export const getProdutos = () => api.get("/produtos/cardapio");
+export const getProdutos = () => api.get("/produtos");
 
 // POST - criar novo produto
 export const createProduto = (data) => api.post("/produtos", data);

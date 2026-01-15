@@ -1,6 +1,6 @@
 // src/components/inicio/header/Header.js
 import React, { useState, useEffect } from "react";
-import { getUsuario } from "../../../api/Usuarios";
+import { getUsuario } from "../../../api/Usuarios"; // caminho corrigido
 import "./Styles.css";
 
 function Header() {
@@ -17,21 +17,13 @@ function Header() {
     }
 
     getUsuario(id_usuario)
-      .then((res) => {
-        if (res.data) {
-          setUsuario(res.data);
-        } else {
-          setUsuario(null);
-        }
+      .then((usuarioData) => {
+        setUsuario(usuarioData || null);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Erro ao buscar usuário:", err);
-        if (err.response) {
-          setErro(`Erro ${err.response.status}: ${err.response.statusText}`);
-        } else {
-          setErro("Servidor não está disponível");
-        }
+        setErro(err.message || "Servidor não está disponível");
         setLoading(false);
       });
   }, []);
@@ -43,10 +35,10 @@ function Header() {
         {erro && <p style={{ color: "red" }}>{erro}</p>}
         {!loading && usuario && (
           <>
-            <img 
-              src={usuario.logo_empresa || "https://via.placeholder.com/150"} 
-              alt={usuario.nome_empresa || usuario.nome} 
-              className="store-logo" 
+            <img
+              src={usuario.logo_empresa || usuario.logo_empresa}
+              alt={usuario.nome_empresa || usuario.nome}
+              className="store-logo"
             />
             <div className="store-text">
               <h2>{usuario.nome_empresa || usuario.nome}</h2>

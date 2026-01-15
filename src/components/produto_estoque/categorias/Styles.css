@@ -1,15 +1,16 @@
 /* ================================
-   Estilo do componente Categoria
+    Estilo do componente Categoria (Ajustado)
 ================================ */
 
-/* Container principal */
+/* Container principal (Inalterado, sem margens laterais fixas para se encaixar no Grid) */
 #categoriaWrapper {
   background: #fff;
-  padding: 28px;                    
-  border-radius: 16px;              
+  padding: 28px;
+  border-radius: 16px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06); 
-  max-width: 900px;                 
-  margin: 0 15px 30px;              
+  /* max-width e margin removidos/ajustados para não quebrar o layout do ProdutoEstoque */
+  max-width: none;
+  margin: 0; 
   transition: all 0.3s ease;
 }
 
@@ -25,7 +26,7 @@
   letter-spacing: -0.3px;
 }
 
-/* Formulário */
+/* Formulário (Mantenho a responsividade) */
 form.form-categoria {
   display: flex;
   flex-wrap: wrap;
@@ -46,7 +47,6 @@ form.form-categoria {
   flex: 1 1 100%;
 }
 
-/* Inputs iguais aos do modal */
 .modal-input {
   border-radius: 10px;
   border: 1px solid #ccc;
@@ -63,7 +63,6 @@ form.form-categoria {
   box-shadow: 0 0 0 3px rgba(214,58,82,0.15);
 }
 
-/* Botão adicionar */
 .btn-primary {
   background-color: #d63a52;
   border: none;
@@ -87,7 +86,7 @@ form.form-categoria {
   box-shadow: 0 3px 8px rgba(214, 58, 82, 0.25);
 }
 
-/* Lista de categorias */
+/* --- Lista de categorias (Correção de Layout) --- */
 #listaCategorias {
   list-style: none;
   margin-top: 10px;
@@ -95,13 +94,17 @@ form.form-categoria {
 }
 
 #listaCategorias li {
-  padding: 10px 14px;
+  padding: 12px 14px; /* Aumentei um pouco o padding para ficar mais clean */
   border-radius: 10px;
   background: #f8f9fb;
   margin-bottom: 8px;
+  
+  /* CORREÇÃO CHAVE: Flexbox para alinhar conteúdo (info) à esquerda e ações à direita */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Empurra os grupos para os lados */
   align-items: center;
+  /* Fim da Correção Chave */
+  
   font-weight: 500;
   color: #333;
   transition: background 0.2s, transform 0.2s;
@@ -109,18 +112,23 @@ form.form-categoria {
 
 #listaCategorias li:hover {
   background: #f1f3f6;
-  transform: scale(1.01);
+  transform: scale(1.005); /* Suavizei a escala para não dar a impressão de "pular" */
 }
 
 .cat-info {
   display: flex;
   align-items: center;
   gap: 12px;
+  /* Permite que o texto encolha, se necessário */
+  min-width: 0; 
+  flex-grow: 1; /* Ocupa o espaço disponível à esquerda */
 }
 
 .cat-actions {
   display: flex;
-  gap: 12px; /* espaço profissional entre botões */
+  gap: 8px; /* Espaço entre os botões */
+  /* Garante que os botões não encolham */
+  flex-shrink: 0; 
 }
 
 .cat-icon {
@@ -131,27 +139,10 @@ form.form-categoria {
 }
 
 /* Botões */
-.btn-edit {
-  background-color: #1e90ff;
+.btn-edit, .btn-delete {
   border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  color: #fff;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-edit:hover {
-  background-color: #1c86ee;
-  transform: translateY(-1px);
-}
-
-.btn-delete {
-  background-color: #dc3545;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
+  border-radius: 6px; /* Levemente menor para um ar mais moderno */
+  padding: 8px 12px;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -159,14 +150,17 @@ form.form-categoria {
   justify-content: center;
   align-items: center;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
-.btn-delete:hover {
-  background-color: #c82333;
-  transform: translateY(-1px);
-}
+.btn-edit { background-color: #007bff; }
+.btn-edit:hover { background-color: #0056b3; transform: translateY(-1px); }
 
-/* Modal */
+.btn-delete { background-color: #dc3545; }
+.btn-delete:hover { background-color: #c82333; transform: translateY(-1px); }
+
+
+/* Modal (Mantido) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -244,23 +238,32 @@ form.form-categoria {
 .btn.salvar { background-color: #28a745; color: #fff; }
 .btn.apagar { background-color: #dc3545; color: #fff; }
 
-/* Responsividade */
+/* --- Responsividade (Ajustado) --- */
 @media (max-width: 600px) {
+  
+  /* Ajusta o formulário para coluna */
   form.form-categoria {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  #listaCategorias li {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .btn-primary {
     width: 100%;
     align-self: stretch;
   }
+  
+  /* Mantém o li na horizontal, ajustando o padding e fonte */
+  #listaCategorias li {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
 
+  /* Reduz o gap entre os botões */
+  .cat-actions {
+    gap: 6px;
+  }
+  
+  /* Ajusta o modal */
   .modal {
     width: 90%;
   }

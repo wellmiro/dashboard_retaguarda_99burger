@@ -1,48 +1,83 @@
-/* Styles.css */
-
 .ranking-produtos {
   margin-top: 30px;
   background-color: #f8f9fa;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ranking-produtos h3 {
-  margin-bottom: 15px;
-  color: #007bff; /* título azul */
+  margin-bottom: 20px;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: left;
 }
 
+/* Linha de produto */
 .produto {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: nowrap;
 }
 
+/* Nome do produto */
 .produto .nome {
-  width: 150px;
-  font-weight: 500;
+  width: 180px;
+  min-width: 150px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
 }
 
+/* Barra de faturamento */
 .barra-bg {
   flex: 1;
-  height: 20px;
-  background-color: #e9ecef; /* fundo cinza */
+  height: 18px;
+  background-color: #e9ecef;
   border-radius: 10px;
   overflow: hidden;
-  margin: 0 10px;
 }
 
 .barra {
   height: 100%;
   border-radius: 10px;
   transition: width 1s ease-in-out;
-  /* cor será definida dinamicamente via style inline do React */
 }
 
-.vendidos {
-  width: 40px;
+/* Quantidade vendida */
+.quantidade-vendida {
+  width: 60px;
   text-align: right;
-  font-weight: 700; /* negrito */
-  color: #6cb2eb;  /* azul claro */
+  font-weight: 700;
+  color: #222;
+  font-size: 0.95rem;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .ranking-produtos {
+    padding: 16px;
+  }
+
+  .produto {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .barra-bg {
+    width: 100%;
+    height: 16px;
+  }
+
+  .quantidade-vendida {
+    align-self: flex-end;
+    font-size: 0.85rem;
+    color: #444;
+  }
 }

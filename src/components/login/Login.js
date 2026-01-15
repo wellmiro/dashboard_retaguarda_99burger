@@ -1,3 +1,4 @@
+// src/pages/Login/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUsuario } from "../../api/Usuarios";
@@ -13,37 +14,36 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    // Limpa erros antigos
     setErroEmail("");
     setErroSenha("");
 
-    if (!email) {
-      setErroEmail("Preencha o email");
-      return;
-    }
-    if (!senha) {
-      setErroSenha("Preencha a senha");
-      return;
-    }
+    // Validações simples
+    if (!email) return setErroEmail("Preencha o email");
+    if (!senha) return setErroSenha("Preencha a senha");
 
     try {
-      const response = await loginUsuario(email, senha);
-      const usuario = response.data;
+      // Chama a API de login
+      const usuario = await loginUsuario(email, senha);
 
+      // Salva os dados do usuário no localStorage
       localStorage.setItem("id_usuario", usuario.id_usuario);
       localStorage.setItem("nome_usuario", usuario.nome);
+      localStorage.setItem("email_usuario", usuario.email);
+      localStorage.setItem("status_usuario", usuario.status);
+      localStorage.setItem("dt_cadastro_usuario", usuario.dt_cadastro);
 
+      // Redireciona para a página inicial
       navigate("/inicio");
     } catch (err) {
-      if (err.response) {
-        const msg = err.response.data.error || "Erro ao efetuar login";
-        if (msg.includes("Usuário ou senha inválidos")) {
-          setErroEmail("Email incorreto ou não cadastrado");
-          setErroSenha("Senha incorreta");
-        } else {
-          setErroEmail(msg);
-        }
+      const msg = err.message || "Erro ao efetuar login";
+
+      // Erros de credenciais
+      if (msg.toLowerCase().includes("usuário") || msg.toLowerCase().includes("senha")) {
+        setErroEmail("Email ou usuário incorreto");
+        setErroSenha("Senha incorreta");
       } else {
-        setErroEmail("Servidor não está disponível");
+        setErroEmail(msg);
       }
     }
   };
@@ -62,7 +62,10 @@ function Login() {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErroEmail("");
+            }}
             placeholder="nome@exemplo.com"
           />
           {erroEmail && <span className="input-error">{erroEmail}</span>}
@@ -73,7 +76,10 @@ function Login() {
           <input
             type="password"
             value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            onChange={(e) => {
+              setSenha(e.target.value);
+              setErroSenha("");
+            }}
             placeholder="********"
           />
           {erroSenha && <span className="input-error">{erroSenha}</span>}
@@ -81,7 +87,9 @@ function Login() {
 
         <div className="button-container">
           <button type="submit">Entrar</button>
-          <a href="#" className="forgot-password">Esqueci a senha</a>
+          <a href="#" onClick={(e) => e.preventDefault()} className="forgot-password">
+            Esqueci a senha
+          </a>
         </div>
       </form>
     </div>

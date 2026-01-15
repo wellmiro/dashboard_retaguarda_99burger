@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { getProdutos } from "../../../../api/Produtos";
+// src/components/estoque/cards/Cards.js
+import React from "react";
 import "./Styles.css";
 
-function Cards() {
-  const [produtos, setProdutos] = useState([]);
-
-  useEffect(() => {
-    const fetchProdutos = async () => {
-      try {
-        const res = await getProdutos();
-        setProdutos(res.data || []);
-      } catch (err) {
-        console.error("Erro ao buscar produtos:", err);
-      }
-    };
-    fetchProdutos();
-  }, []);
-
+function Cards({ produtos }) {
+  // Agora produtos vem por props já filtrado
   const totalItens = produtos.length;
   const qtdTotal = produtos.reduce((sum, p) => sum + Number(p.qtd), 0);
-
   const valorTotal = produtos.reduce(
     (sum, p) => sum + Number(p.qtd) * Number(p.preco),
     0
@@ -35,22 +21,34 @@ function Cards() {
 
   return (
     <div className="cards-container">
-      <div className="card card-total" data-tooltip="Número total de produtos cadastrados no sistema.">
+      <div
+        className="card card-total"
+        data-tooltip="Número total de produtos cadastrados no sistema."
+      >
         <h3>{totalItens}</h3>
         <p>Total de Itens</p>
       </div>
 
-      <div className="card card-pedidos" data-tooltip="Soma da quantidade de todos os produtos disponíveis.">
+      <div
+        className="card card-pedidos"
+        data-tooltip="Soma da quantidade de todos os produtos disponíveis."
+      >
         <h3>{qtdTotal}</h3>
         <p>Qtd. Total</p>
       </div>
 
-      <div className="card card-ticket" data-tooltip="Valor total de todos os produtos em estoque.">
+      <div
+        className="card card-ticket"
+        data-tooltip="Valor total de todos os produtos em estoque."
+      >
         <h3>{formatCurrency(valorTotal)}</h3>
         <p>Valor Total</p>
       </div>
 
-      <div className="card card-produtos" data-tooltip="Soma do valor total dos 5 produtos com maior valor (quantidade x preço unitário).">
+      <div
+        className="card card-produtos"
+        data-tooltip="Soma do valor total dos 5 produtos com maior valor (quantidade x preço unitário)."
+      >
         <h3>{formatCurrency(top5Valor)}</h3>
         <p>Top 5 Valor</p>
       </div>

@@ -1,123 +1,160 @@
-// src/components/inicio/cards/Cards.js
 import React, { useState, useEffect } from "react";
 import { getPedidos } from "../../../api/Pedidos";
+
 import "./Styles.css";
 
-function Cards() {
+function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechamento, setHoraFechamento }) {
   const [pedidosDoDia, setPedidosDoDia] = useState(0);
   const [faturamentoDoDia, setFaturamentoDoDia] = useState(0);
   const [taxaEntrega, setTaxaEntrega] = useState(0);
   const [produtosVendidos, setProdutosVendidos] = useState(0);
 
-  // Função que interpreta datas no formato BR ou ISO automaticamente
   const parseDataBR = (dt) => {
     if (!dt) return null;
-
-    // Se já vier no formato ISO (2025-10-04T13:20:00)
     if (dt.includes("-")) return new Date(dt);
-
-    // Caso contrário, assume formato BR (04/10/2025 13:20:00)
     const [data, hora] = dt.split(" ");
     const [dia, mes, ano] = data.split("/");
-    return new Date(`${ano}-${mes}-${dia}T${hora}`);
+    const horario = hora || "00:00:00";
+    return new Date(`${ano}-${mes}-${dia}T${horario}`);
+  };
+
+  const getIntervalo = () => {
+    const agora = new Date();
+    let inicio = new Date();
+    let fim = new Date();
+
+    if (filtro === "hoje") {
+      inicio.setHours(...horaAbertura.split(":"), 0, 0);
+      fim.setHours(...horaFechamento.split(":"), 59, 999);
+      if (fim.getTime() <= inicio.getTime()) fim.setDate(fim.getDate() + 1);
+    } else if (filtro === "ontem") {
+      inicio.setDate(inicio.getDate() - 1);
+      fim.setDate(fim.getDate() - 1);
+      inicio.setHours(...horaAbertura.split(":"), 0, 0);
+      fim.setHours(...horaFechamento.split(":"), 59, 999);
+      if (fim.getTime() <= inicio.getTime()) fim.setDate(fim.getDate() + 1);
+    }
+
+    return { inicio, fim };
   };
 
   useEffect(() => {
     getPedidos()
       .then((res) => {
-        const pedidos = res.data || [];
-        console.log("📦 Retorno da API de Pedidos:", pedidos);
+        // Garante que sempre seja um array
+        const pedidos = Array.isArray(res.data) ? res.data : res.data?.pedidos || [];
 
-        const hoje = new Date();
-        const pedidosHoje = pedidos.filter((p) => {
+        const { inicio, fim } = getIntervalo();
+
+        const pedidosPeriodo = pedidos.filter((p) => {
           const dataPedido = parseDataBR(p.dt_pedido || p.data_pedido);
-          if (!dataPedido) return false;
           return (
-            dataPedido.getDate() === hoje.getDate() &&
-            dataPedido.getMonth() === hoje.getMonth() &&
-            dataPedido.getFullYear() === hoje.getFullYear()
+            dataPedido &&
+            dataPedido.getTime() >= inicio.getTime() &&
+            dataPedido.getTime() <= fim.getTime()
           );
         });
 
-        console.log("📅 Pedidos de hoje:", pedidosHoje);
+        setPedidosDoDia(pedidosPeriodo.length);
 
-        // Total de pedidos do dia
-        setPedidosDoDia(pedidosHoje.length);
-
-        // Faturamento total (somando vl_total)
-        const totalFaturamento = pedidosHoje.reduce(
+        const totalFaturamento = pedidosPeriodo.reduce(
           (acc, p) => acc + parseFloat(p.vl_total || p.valor_total || 0),
           0
         );
         setFaturamentoDoDia(totalFaturamento);
 
-        // Taxa de entrega
-        const totalEntrega = pedidosHoje.reduce(
+        const totalEntrega = pedidosPeriodo.reduce(
           (acc, p) => acc + parseFloat(p.vl_entrega || p.valor_entrega || 0),
           0
         );
         setTaxaEntrega(totalEntrega);
 
-        // Total de produtos vendidos (somando qtd de itens)
-        const totalProdutos = pedidosHoje.reduce((acc, p) => {
-          const itens = p.itens || p.pedido_itens || [];
+        const totalProdutos = pedidosPeriodo.reduce((acc, p) => {
+          const itens = Array.isArray(p.itens) ? p.itens : p.itens || p.pedido_itens || [];
           return (
             acc +
             itens.reduce(
-              (subAcc, item) => subAcc + parseFloat(item.qtd || item.quantidade || 0),
+              (subAcc, item) =>
+                subAcc + parseFloat(item.qtd || item.quantidade || 0),
               0
             )
           );
         }, 0);
         setProdutosVendidos(totalProdutos);
       })
-      .catch((err) => {
-        console.error("❌ Erro ao buscar pedidos:", err);
-      });
-  }, []);
+      .catch((err) => console.error("Erro ao buscar pedidos:", err));
+  }, [filtro, horaAbertura, horaFechamento]);
 
   return (
-    <div className="cards-row">
-      <div className="card bg-danger">
-        <div className="card-left">
-          <div className="card-icon">📦</div>
-          <div className="card-info">
-            <span className="card-value">{pedidosDoDia}</span>
-            <span className="card-label">Pedidos do dia</span>
-          </div>
-        </div>
+    <div className="cards-wrapper">
+      <div className="filtros">
+        <label>
+          Período:
+          <select value={filtro} onChange={(e) => setFiltro(e.target.value)}>
+            <option value="hoje">Hoje</option>
+            <option value="ontem">Ontem</option>
+          </select>
+        </label>
+        <label>
+          Abertura:
+          <input
+            type="time"
+            value={horaAbertura}
+            onChange={(e) => setHoraAbertura(e.target.value)}
+          />
+        </label>
+        <label>
+          Fechamento:
+          <input
+            type="time"
+            value={horaFechamento}
+            onChange={(e) => setHoraFechamento(e.target.value)}
+          />
+        </label>
       </div>
 
-      <div className="card bg-success">
-        <div className="card-left">
-          <div className="card-icon">💰</div>
-          <div className="card-info">
-            <span className="card-value">
-              R$ {(faturamentoDoDia || 0).toFixed(2)}
-            </span>
-            <span className="card-label">Faturamento do dia</span>
+      <div className="cards-row">
+        <div className="card bg-danger">
+          <div className="card-left">
+            <div className="card-icon">📦</div>
+            <div className="card-info">
+              <span className="card-value">{pedidosDoDia}</span>
+              <span className="card-label">Pedidos no período</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="card bg-warning text-dark">
-        <div className="card-left">
-          <div className="card-icon">🚚</div>
-          <div className="card-info">
-            <span className="card-value">
-              R$ {(taxaEntrega || 0).toFixed(2)}
-            </span>
-            <span className="card-label">Taxa de entrega</span>
+        <div className="card bg-success">
+          <div className="card-left">
+            <div className="card-icon">💰</div>
+            <div className="card-info">
+              <span className="card-value">
+                R$ {(faturamentoDoDia || 0).toFixed(2)}
+              </span>
+              <span className="card-label">Faturamento</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="card bg-primary">
-        <div className="card-left">
-          <div className="card-icon">🛒</div>
-          <div className="card-info">
-            <span className="card-value">{produtosVendidos}</span>
-            <span className="card-label">Produtos vendidos</span>
+        <div className="card bg-warning text-dark">
+          <div className="card-left">
+            <div className="card-icon">🚚</div>
+            <div className="card-info">
+              <span className="card-value">
+                R$ {(taxaEntrega || 0).toFixed(2)}
+              </span>
+              <span className="card-label">Taxa de entrega</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-primary">
+          <div className="card-left">
+            <div className="card-icon">🛒</div>
+            <div className="card-info">
+              <span className="card-value">{produtosVendidos}</span>
+              <span className="card-label">Produtos vendidos</span>
+            </div>
           </div>
         </div>
       </div>

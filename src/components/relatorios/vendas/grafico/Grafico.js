@@ -29,6 +29,7 @@ function Grafico({ filtroData = {} }) {
 
     const vendasPorDia = {};
     pedidos.forEach((pedido) => {
+      if (!pedido.dt_pedido) return;
       const [dia, mes, anoHora] = pedido.dt_pedido.split("/");
       const [ano, hora] = anoHora.split(" ");
       const pedidoData = dayjs(`${ano}-${mes}-${dia}T${hora || "00:00"}`);
@@ -52,9 +53,7 @@ function Grafico({ filtroData = {} }) {
 
     const ctx = chartRef.current.getContext("2d");
 
-    if (chartInstanceRef.current) {
-      chartInstanceRef.current.destroy();
-    }
+    if (chartInstanceRef.current) chartInstanceRef.current.destroy();
 
     chartInstanceRef.current = new Chart(ctx, {
       type: "line",
@@ -77,6 +76,7 @@ function Grafico({ filtroData = {} }) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: {

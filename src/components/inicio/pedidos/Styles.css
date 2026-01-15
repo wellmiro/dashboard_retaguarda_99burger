@@ -1,29 +1,44 @@
+/* Container principal */
 .lista-container {
   width: 100%;
-  border-collapse: collapse;
-  background: white;
+  background: #fff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-bottom: 40px;
+  overflow-x: auto; /* permite scroll horizontal leve no mobile */
+  padding: 16px;
+  box-sizing: border-box;
+  display: block;
 }
 
+/* Tabela */
+.lista-estoque {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* garante proporções iguais */
+  min-width: 600px; /* mantém largura mínima no mobile */
+}
+
+/* Células */
 .lista-estoque th,
 .lista-estoque td {
-  padding: 12px 16px;
+  padding: 12px 10px;
   border-bottom: 1px solid #e5e7eb;
   text-align: left;
   vertical-align: middle;
   font-size: 14px;
-  white-space: nowrap; /* impede quebra de linha */
+  word-wrap: break-word;
+  white-space: normal;
 }
 
+/* Cabeçalho */
 .lista-estoque th {
   background-color: #3b82f6;
-  color: white;
+  color: #fff;
+  font-weight: 600;
 }
 
-/* Centralizar colunas de ID, Valor e Status */
+/* Centralizar colunas específicas */
 .lista-estoque th:nth-child(1),
 .lista-estoque th:nth-child(3),
 .lista-estoque th:nth-child(4),
@@ -31,29 +46,6 @@
 .lista-estoque td:nth-child(3),
 .lista-estoque td:nth-child(4) {
   text-align: center;
-}
-
-/* Status badge profissional */
-.status {
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px; /* arredondado estilo badge */
-  display: inline-block;
-  text-align: center;
-  font-size: 0.85rem;
-  min-width: 90px; /* largura mínima */
-  white-space: nowrap;
-}
-
-/* Cores consistentes */
-.status.andamento { background-color: #cce5ff; color: #004085; }
-.status.finalizado { background-color: #d4edda; color: #155724; }
-.status.cancelado { background-color: #f8d7da; color: #721c24; }
-
-/* Cabeçalho h3 */
-.pedidos-recentes h3 {
-  margin-bottom: 15px;
-  color: #3b82f6;
 }
 
 /* Linhas alternadas */
@@ -64,8 +56,54 @@
   background-color: #ffffff;
 }
 
-/* Hover linha */
+/* Hover */
 .lista-estoque tbody tr:hover {
   background-color: #e2e8f0;
   transition: background 0.2s;
+}
+
+/* Cabeçalho */
+.pedidos-recentes h3 {
+  margin-bottom: 15px;
+  color: #3b82f6;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Badge de status */
+.status-badge {
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  font-size: 0.85rem;
+  min-width: 90px;
+  text-align: center;
+}
+
+/* Cores dos status */
+.andamento .status-badge {
+  background-color: #cce5ff;
+  color: #004085;
+}
+.finalizado .status-badge {
+  background-color: #d4edda;
+  color: #155724;
+}
+.cancelado .status-badge {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Botão expandir */
+.btn-expand {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #3b82f6;
+  transition: transform 0.2s;
+}
+.btn-expand:hover {
+  transform: scale(1.2);
 }

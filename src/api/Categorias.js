@@ -8,10 +8,10 @@ export const getCategorias = () => api.get("/categorias");
 export const postCategoria = (categoria) => api.post("/categorias", categoria);
 
 // Atualizar categoria
-export const putCategoria = (id, categoria) => api.put(`/categorias?id=${id}`, categoria);
+export const putCategoria = (id, categoria) => api.put(`/categorias/${id}`, categoria);
 
 // Deletar categoria
-export const deleteCategoria = (id) => api.delete(`/categorias?id=${id}`);
+export const deleteCategoria = (id) => api.delete(`/categorias/${id}`);
 
 export default {
   getCategorias,

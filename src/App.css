@@ -3,59 +3,40 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
+  overflow-x: auto; /* 🔹 alterado para permitir scroll horizontal se necessário */
 }
 
-/* Wrapper geral */
+/* Dashboard */
 .dashboard-wrapper {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
-/* Sidebar fixo */
-.sidebar {
-  width: 220px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  background-color: #252629;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  border-right: 1px solid #333;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
-  box-sizing: border-box;
-}
-
-.sidebar.collapsed {
-  width: 70px;
-  padding: 20px 10px;
-}
-
-/* Área de conteúdo */
 .content-container {
-  margin-left: 220px; /* alinhado com sidebar expandido */
   flex: 1;
   padding: 20px;
-  transition: margin-left 0.3s ease;
   box-sizing: border-box;
+  transition: margin-left 0.3s ease, padding 0.3s ease, width 0.3s ease;
+  margin-left: 220px;
+  max-width: calc(100% - 220px);
+  overflow-x: auto; /* 🔹 alterado para permitir scroll horizontal das tabelas */
 }
 
 .content-container.collapsed {
-  margin-left: 70px; /* alinhado com sidebar encolhido */
+  margin-left: 70px;
+  max-width: calc(100% - 70px);
 }
 
-/* Dashboard main area */
 .dashboard-main-area {
   width: 100%;
   height: 100%;
-  padding: 0; /* sem margem extra */
+  padding: 0;
   box-sizing: border-box;
   overflow-y: auto;
 }
 
-/* Cards e seções internas */
+/* Cards */
 .cards {
   display: flex;
   gap: 20px;
@@ -72,9 +53,14 @@ body {
   padding: 15px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
 }
 
-/* Tabelas, ranking, etc */
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* Tabelas */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -82,18 +68,72 @@ table {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  table-layout: fixed; /* garante colunas proporcionais */
+  min-width: 600px; /* 🔹 garante largura mínima para não quebrar no mobile */
 }
 
 th, td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  word-wrap: break-word;
+  white-space: normal; /* 🔹 permite quebra de linha */
 }
 
+/* Ranking de produtos */
 .ranking-produtos {
   margin-top: 30px;
   background-color: #f8f9fa;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar */
+.dashboard-main-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-main-area::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .content-container {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .content-container.collapsed {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .cards {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card {
+    flex: 1 1 100%;
+  }
+
+  table, .ranking-produtos {
+    width: 100%;
+    padding: 10px;
+    min-width: 100%; /* 🔹 força a tabela ocupar toda a largura */
+  }
+
+  .dashboard-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 769px) {
+  .content-container {
+    transition: margin-left 0.3s ease, max-width 0.3s ease;
+  }
 }

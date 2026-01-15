@@ -16,6 +16,7 @@ function Lista({ filtroData = {} }) {
         const fimFiltro = filtroData.fim ? dayjs(filtroData.fim) : dayjs().endOf("year");
 
         pedidos = pedidos.filter((pedido) => {
+          if (!pedido.dt_pedido) return false;
           const [dia, mes, anoHora] = pedido.dt_pedido.split("/");
           const [ano, hora] = anoHora.split(" ");
           const pedidoData = dayjs(`${ano}-${mes}-${dia}T${hora || "00:00"}`);
@@ -38,37 +39,32 @@ function Lista({ filtroData = {} }) {
             if (anoHora) {
               const [ano, hora] = anoHora.split(" ");
               const dataObj = new Date(`${ano}-${mes}-${dia}T${hora}`);
-              if (!isNaN(dataObj)) {
-                mesNome = dataObj.toLocaleString("pt-BR", { month: "long" });
-              }
+              if (!isNaN(dataObj)) mesNome = dataObj.toLocaleString("pt-BR", { month: "long" });
             }
           }
 
-          if (pedido.itens && Array.isArray(pedido.itens)) {
-            pedido.itens.forEach((item) => {
-              const produto = item.nome_produto || "Produto Desconhecido";
-              const categoria = item.categoria || "Sem Categoria";
-              const categoria_icone = item.categoria_icone || null;
-              const qtd = parseFloat(item.qtd) || 0;
-              const valor = parseFloat(item.vl_total) || 0;
+          pedido.itens?.forEach((item) => {
+            const produto = item.nome_produto || "Produto Desconhecido";
+            const categoria = item.categoria || "Sem Categoria";
+            const categoria_icone = item.categoria_icone || null;
+            const qtd = parseFloat(item.qtd) || 0;
+            const valor = parseFloat(item.vl_total) || 0;
 
-              const chave = `${mesNome}-${produto}-${categoria}`;
-              const existente = mapProdutoMes.get(chave) || { qtd: 0, total: 0, mes: mesNome, produto, categoria, categoria_icone };
+            const chave = `${mesNome}-${produto}-${categoria}`;
+            const existente = mapProdutoMes.get(chave) || { qtd: 0, total: 0, mes: mesNome, produto, categoria, categoria_icone };
 
-              mapProdutoMes.set(chave, {
-                qtd: existente.qtd + qtd,
-                total: existente.total + valor,
-                mes: mesNome,
-                produto,
-                categoria,
-                categoria_icone,
-              });
+            mapProdutoMes.set(chave, {
+              qtd: existente.qtd + qtd,
+              total: existente.total + valor,
+              mes: mesNome,
+              produto,
+              categoria,
+              categoria_icone,
             });
-          }
+          });
         });
 
         const totaisArray = Array.from(mapProdutoMes.values()).sort((a, b) => b.total - a.total);
-
         setTotaisPorProdutoMes(totaisArray);
       } catch (error) {
         console.error("Erro ao buscar pedidos:", error);
@@ -89,47 +85,49 @@ function Lista({ filtroData = {} }) {
   const maxQtd = Math.max(...totaisPorProdutoMes.map((item) => item.qtd), 1);
 
   return (
-    <div>
+    <div className="lista-container">
       <h3>Total Vendido por Produto / Mês</h3>
-      <table className="lista-vendas">
-        <thead>
-          <tr>
-            <th>Mês</th>
-            <th>Produto</th>
-            <th>Categoria</th>
-            <th>Qtd Total</th>
-            <th>Valor Total (R$)</th>
-            <th>Performance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {totaisPorProdutoMes.length === 0 ? (
+      <div className="lista-scroll">
+        <table className="lista-vendas">
+          <thead>
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
-                Nenhum total encontrado
-              </td>
+              <th>Mês</th>
+              <th>Produto</th>
+              <th>Categoria</th>
+              <th>Qtd Total</th>
+              <th>Valor Total (R$)</th>
+              <th>Performance</th>
             </tr>
-          ) : (
-            totaisPorProdutoMes.map((item, index) => (
-              <tr key={index}>
-                <td className="mes-coluna">{item.mes}</td>
-                <td>{item.produto}</td>
-                <td>
-                  {item.categoria}
-                  {item.categoria_icone && (
-                    <img src={item.categoria_icone} alt={item.categoria} style={{ width: 20, height: 20, marginLeft: 5 }} />
-                  )}
-                </td>
-                <td>{item.qtd.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</td>
-                <td>{item.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td>
-                  <span className={`bolinha ${getPerformanceClass(item.qtd, maxQtd)}`} title={`Performance: ${getPerformanceClass(item.qtd, maxQtd)}`} />
+          </thead>
+          <tbody>
+            {totaisPorProdutoMes.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  Nenhum total encontrado
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              totaisPorProdutoMes.map((item, index) => (
+                <tr key={index}>
+                  <td className="mes-coluna">{item.mes}</td>
+                  <td>{item.produto}</td>
+                  <td>
+                    {item.categoria}
+                    {item.categoria_icone && (
+                      <img src={item.categoria_icone} alt={item.categoria} className="categoria-icone"/>
+                    )}
+                  </td>
+                  <td>{item.qtd.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</td>
+                  <td>{item.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>
+                    <span className={`bolinha ${getPerformanceClass(item.qtd, maxQtd)}`} title={`Performance: ${getPerformanceClass(item.qtd, maxQtd)}`}/>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
