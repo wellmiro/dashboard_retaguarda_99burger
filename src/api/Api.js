@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000", // conecta ao backend local
+  baseURL: "https://nonautobiographical-uncapitulating-henry.ngrok-free.dev", // conecta ao backend local
   headers: {
     "Content-Type": "application/json",
   },
