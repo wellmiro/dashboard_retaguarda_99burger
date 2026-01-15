@@ -9,41 +9,63 @@ function Login() {
   const [senha, setSenha] = useState("");
   const [erroEmail, setErroEmail] = useState("");
   const [erroSenha, setErroSenha] = useState("");
+  const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Limpa erros antigos
+    // Limpa estados de erro e ativa carregamento
     setErroEmail("");
     setErroSenha("");
+    setCarregando(true);
 
-    // Validações simples
-    if (!email) return setErroEmail("Preencha o email");
-    if (!senha) return setErroSenha("Preencha a senha");
+    // Validações simples de formulário
+    if (!email) {
+      setCarregando(false);
+      return setErroEmail("Preencha o email");
+    }
+    if (!senha) {
+      setCarregando(false);
+      return setErroSenha("Preencha a senha");
+    }
 
     try {
       // Chama a API de login
       const usuario = await loginUsuario(email, senha);
 
-      // Salva os dados do usuário no localStorage
-      localStorage.setItem("id_usuario", usuario.id_usuario);
-      localStorage.setItem("nome_usuario", usuario.nome);
-      localStorage.setItem("email_usuario", usuario.email);
-      localStorage.setItem("status_usuario", usuario.status);
-      localStorage.setItem("dt_cadastro_usuario", usuario.dt_cadastro);
+      // Verifica se a API retornou o usuário corretamente antes de salvar
+      if (usuario && usuario.id_usuario) {
+        // Salva os dados do usuário no localStorage
+        localStorage.setItem("id_usuario", usuario.id_usuario);
+        localStorage.setItem("nome_usuario", usuario.nome);
+        localStorage.setItem("email_usuario", usuario.email);
+        localStorage.setItem("status_usuario", usuario.status);
+        localStorage.setItem("dt_cadastro_usuario", usuario.dt_cadastro);
 
-      // Redireciona para a página inicial
-      navigate("/inicio");
-    } catch (err) {
-      const msg = err.message || "Erro ao efetuar login";
-
-      // Erros de credenciais
-      if (msg.toLowerCase().includes("usuário") || msg.toLowerCase().includes("senha")) {
-        setErroEmail("Email ou usuário incorreto");
-        setErroSenha("Senha incorreta");
+        // O setTimeout ajuda a garantir que o localStorage foi gravado 
+        // antes do redirecionamento para evitar bugs de rotas protegidas
+        setTimeout(() => {
+          navigate("/inicio");
+        }, 200);
       } else {
-        setErroEmail(msg);
+        throw new Error("Dados de usuário inválidos");
+      }
+
+    } catch (err) {
+      setCarregando(false);
+      // Pega a mensagem de erro vinda do servidor ou da exceção
+      const msg = err.response?.data?.error || err.message || "Erro ao efetuar login";
+
+      // Verifica se o erro é de credenciais para exibir na tela
+      const erroTexto = msg.toLowerCase();
+      if (erroTexto.includes("usuário") || erroTexto.includes("senha") || erroTexto.includes("incorreto") || erroTexto.includes("inválido")) {
+        setErroEmail("Verifique suas credenciais");
+        setErroSenha("Email ou senha incorretos");
+      } else {
+        // Para erros técnicos (ex: servidor fora do ar)
+        setErroEmail("Falha na conexão com o servidor");
+        console.error("Erro no login:", msg);
       }
     }
   };
@@ -62,11 +84,13 @@ function Login() {
           <input
             type="email"
             value={email}
+            disabled={carregando}
             onChange={(e) => {
               setEmail(e.target.value);
               setErroEmail("");
             }}
             placeholder="nome@exemplo.com"
+            autoComplete="email"
           />
           {erroEmail && <span className="input-error">{erroEmail}</span>}
         </label>
@@ -76,17 +100,21 @@ function Login() {
           <input
             type="password"
             value={senha}
+            disabled={carregando}
             onChange={(e) => {
               setSenha(e.target.value);
               setErroSenha("");
             }}
             placeholder="********"
+            autoComplete="current-password"
           />
           {erroSenha && <span className="input-error">{erroSenha}</span>}
         </label>
 
         <div className="button-container">
-          <button type="submit">Entrar</button>
+          <button type="submit" disabled={carregando}>
+            {carregando ? "Entrando..." : "Entrar"}
+          </button>
           <a href="#" onClick={(e) => e.preventDefault()} className="forgot-password">
             Esqueci a senha
           </a>
