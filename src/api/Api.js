@@ -7,12 +7,11 @@ import axios from "axios";
  * não bloqueie a resposta JSON com a página de aviso do ngrok.
  */
 const api = axios.create({
-  baseURL: "https://api-99burger.onrender.com", 
+  baseURL: "https://api-99burger.onrender.com",
   headers: {
     "Content-Type": "application/json",
-    "Accept": "application/json",
-    "ngrok-skip-browser-warning": "69420" // Pode ser qualquer valor, ex: "true" ou "69420"
-  },
+    "Accept": "application/json"
+  }
 });
 
 // --- Endpoints de Consulta (Dashboard e Listagens) ---
