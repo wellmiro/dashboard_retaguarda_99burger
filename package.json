@@ -26,6 +26,8 @@
 
     "chartjs-plugin-datalabels": "^2.2.0",
 
+    "cors": "^2.8.5",
+
     "dayjs": "^1.11.18",
 
     "lucide-react": "^0.545.0",
@@ -95,3 +97,4 @@
   }
 
 }
+
