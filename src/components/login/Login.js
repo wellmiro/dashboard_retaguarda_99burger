@@ -1,10 +1,10 @@
-// src/pages/Login/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUsuario } from "../../api/Usuarios";
 import "./Styles.css";
 
-function Login() {
+// Adicione { onLoginSuccess } aqui nos parênteses
+function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erroEmail, setErroEmail] = useState("");
@@ -14,13 +14,10 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Limpa estados de erro e ativa carregamento
     setErroEmail("");
     setErroSenha("");
     setCarregando(true);
 
-    // Validações simples de formulário
     if (!email) {
       setCarregando(false);
       return setErroEmail("Preencha o email");
@@ -31,20 +28,20 @@ function Login() {
     }
 
     try {
-      // Chama a API de login
       const usuario = await loginUsuario(email, senha);
 
-      // Verifica se a API retornou o usuário corretamente antes de salvar
       if (usuario && usuario.id_usuario) {
-        // Salva os dados do usuário no localStorage
         localStorage.setItem("id_usuario", usuario.id_usuario);
         localStorage.setItem("nome_usuario", usuario.nome);
         localStorage.setItem("email_usuario", usuario.email);
         localStorage.setItem("status_usuario", usuario.status);
         localStorage.setItem("dt_cadastro_usuario", usuario.dt_cadastro);
 
-        // O setTimeout ajuda a garantir que o localStorage foi gravado 
-        // antes do redirecionamento para evitar bugs de rotas protegidas
+        // Avisa o componente App para atualizar o estado e liberar as rotas
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+
         setTimeout(() => {
           navigate("/inicio");
         }, 200);
@@ -54,16 +51,12 @@ function Login() {
 
     } catch (err) {
       setCarregando(false);
-      // Pega a mensagem de erro vinda do servidor ou da exceção
       const msg = err.response?.data?.error || err.message || "Erro ao efetuar login";
-
-      // Verifica se o erro é de credenciais para exibir na tela
       const erroTexto = msg.toLowerCase();
       if (erroTexto.includes("usuário") || erroTexto.includes("senha") || erroTexto.includes("incorreto") || erroTexto.includes("inválido")) {
         setErroEmail("Verifique suas credenciais");
         setErroSenha("Email ou senha incorretos");
       } else {
-        // Para erros técnicos (ex: servidor fora do ar)
         setErroEmail("Falha na conexão com o servidor");
         console.error("Erro no login:", msg);
       }
