@@ -15,27 +15,29 @@ import "./App.css";
 
 function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  // Transformamos em estado para o React "perceber" a mudança
+  const [user, setUser] = useState(localStorage.getItem("id_usuario")); 
 
-  const isLoggedIn = !!localStorage.getItem("id_usuario"); // verifica se está logado
+  // Função para atualizar o estado quando logar
+  const handleLoginSuccess = () => {
+    setUser(localStorage.getItem("id_usuario"));
+  };
 
   return (
     <Router>
       <Routes>
-        {/* Página inicial redireciona para login se não estiver logado */}
         <Route
           path="/"
-          element={isLoggedIn ? <Navigate to="/inicio" /> : <Navigate to="/login" />}
+          element={user ? <Navigate to="/inicio" /> : <Navigate to="/login" />}
         />
 
-        {/* Rota do Login não mostra Sidebar */}
-        <Route path="/login" element={<Login />} />
+        {/* Passamos a função para o Login avisar o App que deu certo */}
+        <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
 
-        {/* Rotas do Dashboard (com Sidebar) */}
         <Route
           path="/*"
           element={
-            isLoggedIn ? (
+            user ? (
               <div className="dashboard-wrapper">
                 <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
                 <div className={`content-container ${isCollapsed ? "collapsed" : ""}`}>

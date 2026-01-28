@@ -1,199 +1,162 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { getCategorias, postCategoria, putCategoria, deleteCategoria } from '../../../api/Api';
 import './Styles.css';
-import { getCategorias, postCategoria, putCategoria, deleteCategoria } from '../../../api/Categorias';
 
-const Categorias = () => { // Renomeado o componente para Categorias
+const Categorias = () => {
     const [categorias, setCategorias] = useState([]);
-    const [novaCategoria, setNovaCategoria] = useState('');
-    const [novaUrl, setNovaUrl] = useState('');
-    const [mensagem, setMensagem] = useState('');
+    // Ajustado para url_icone para bater com seu JSON
+    const [novaCategoria, setNovaCategoria] = useState({ descricao: '', ordem: '', url_icone: '' });
+    const [editando, setEditando] = useState(null);
+    const [mensagem, setMensagem] = useState({ texto: '', tipo: '' });
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Modal
-    const [modalCat, setModalCat] = useState(null);
-    const [nomeEdit, setNomeEdit] = useState('');
-    const [urlEdit, setUrlEdit] = useState('');
+    const imgDefault = "https://cdn-icons-png.flaticon.com/512/3075/3075977.png";
 
-    // Função auxiliar para mostrar e esconder mensagem
-    const showMessage = (msg) => {
-        setMensagem(msg);
-        setTimeout(() => setMensagem(''), 3000);
-    };
-
-    // Função de Busca com useCallback
     const carregarCategorias = useCallback(async () => {
+        setIsLoading(true);
         try {
             const res = await getCategorias();
-            // Garantir que res.data é array
-            const dataArray = Array.isArray(res.data) ? res.data : res.data.categorias || [];
-            const formatted = dataArray.map(cat => ({
-                id: cat.id_categoria,
-                nome: cat.descricao,
-                url_foto: cat.url_icone
+            const dados = Array.isArray(res.data) ? res.data : (res.data.categorias || []);
+            
+            // Higienização usando o campo correto do banco: url_icone
+            const higienizados = dados.map(item => ({
+                ...item,
+                url_icone: item.url_icone || ''
             }));
-            setCategorias(formatted);
-        } catch (err) {
-            console.error('Erro ao buscar categorias:', err);
-            showMessage('❌ Erro ao carregar categorias!');
-            setCategorias([]); // Garante que o estado seja um array
+
+            setCategorias(higienizados.sort((a, b) => Number(a.ordem) - Number(b.ordem)));
+        } catch (err) { 
+            exibirMensagem("Erro ao carregar do banco", "erro"); 
+        } finally { 
+            setIsLoading(false); 
         }
     }, []);
 
-    // Buscar categorias ao montar o componente
-    useEffect(() => {
-        carregarCategorias();
-    }, [carregarCategorias]); // Dependência adicionada
+    useEffect(() => { carregarCategorias(); }, [carregarCategorias]);
 
-    // Adicionar categoria via POST
-    const addCategoria = async () => {
-        const nome = novaCategoria.trim();
-        const url_foto = novaUrl.trim();
-        if (!nome) return showMessage('⚠️ Digite o nome da categoria!');
-        if (!url_foto) return showMessage('⚠️ Digite a URL do ícone!');
-
-        const novoBody = { descricao: nome, ordem: categorias.length + 1, url_icone: url_foto };
-
-        try {
-            const res = await postCategoria(novoBody);
-            // Lógica para obter o ID do produto da resposta da API (ajustada para ser mais robusta)
-            const novoId = res.data?.id_categoria || res.data?.categoria?.id_categoria || Date.now(); 
-            
-            setCategorias(prev => [...prev, { id: novoId, nome, url_foto }]);
-            setNovaCategoria('');
-            setNovaUrl('');
-            showMessage('✅ Categoria cadastrada com sucesso!');
-        } catch (err) {
-            console.error('Erro ao cadastrar categoria:', err);
-            showMessage('❌ Erro ao cadastrar categoria!');
-        }
+    const exibirMensagem = (texto, tipo) => {
+        setMensagem({ texto, tipo });
+        setTimeout(() => setMensagem({ texto: '', tipo: '' }), 3000);
     };
 
-    const openModal = (cat) => {
-        setModalCat(cat);
-        setNomeEdit(cat.nome);
-        setUrlEdit(cat.url_foto);
+    const iniciarEdicao = (cat) => {
+        setEditando({
+            id_categoria: cat.id_categoria,
+            descricao: cat.descricao || '',
+            ordem: cat.ordem || 0,
+            url_icone: cat.url_icone || '' // Pegando o valor real do banco
+        });
     };
 
-    const saveEdits = async () => {
-        if (!nomeEdit.trim() || !urlEdit.trim()) {
-            showMessage('⚠️ Preencha todos os campos antes de salvar!');
-            return;
-        }
-
-        const updatedBody = {
-            descricao: nomeEdit,
-            ordem: (categorias.findIndex(c => c.id === modalCat.id) + 1) || 1,
-            url_icone: urlEdit
-        };
-
+    const handleSalvarEdicao = async () => {
         try {
-            await putCategoria(modalCat.id, updatedBody);
-            const updated = categorias.map(c =>
-                c.id === modalCat.id ? { ...c, nome: nomeEdit, url_foto: urlEdit } : c
-            );
-            setCategorias(updated);
-            setModalCat(null);
-            showMessage('✅ Categoria atualizada com sucesso!');
-        } catch (err) {
-            console.error('Erro ao atualizar categoria:', err);
-            showMessage('❌ Erro ao atualizar categoria!');
-        }
+            await putCategoria(editando.id_categoria, editando);
+            setEditando(null);
+            exibirMensagem("Registro atualizado!", "sucesso");
+            carregarCategorias();
+        } catch (err) { exibirMensagem("Erro ao salvar alterações", "erro"); }
     };
 
-    const removeCategoria = async (id) => {
-        if (!window.confirm('Deseja realmente apagar esta categoria?')) return;
-
-        try {
-            await deleteCategoria(id);
-            setCategorias(prev => prev.filter(c => c.id !== id));
-            showMessage('✅ Categoria removida com sucesso!');
-        } catch (err) {
-            console.error('Erro ao deletar categoria:', err);
-            showMessage('❌ Erro ao deletar categoria!');
+    const handleUrlPrompt = () => {
+        const novaUrl = window.prompt("Edite o link da imagem:", editando.url_icone);
+        if (novaUrl !== null) {
+            setEditando(prev => ({ ...prev, url_icone: novaUrl }));
         }
     };
 
     return (
         <div id="categoriaWrapper">
-            <h2 className="section-title">Cadastro de Categoria</h2>
+            <h2 className="section-title">Gerenciar Categorias</h2>
+            {mensagem.texto && <div className={`mensagem ${mensagem.tipo}`}>{mensagem.texto}</div>}
 
-            {mensagem && <div className="mensagem">{mensagem}</div>}
-
-            <form className="form-categoria" onSubmit={e => e.preventDefault()}>
-                {/* ... (formulário de nova categoria) ... */}
-                <div className="form-group full">
-                    <label htmlFor="novaCategoria">Nome da Categoria</label>
-                    <input
-                        id="novaCategoria"
-                        className="form-control modal-input"
-                        placeholder="Digite o nome"
-                        value={novaCategoria}
-                        onChange={e => setNovaCategoria(e.target.value)}
-                    />
+            {/* FORMULÁRIO DE CADASTRO */}
+            <form className="form-categoria" onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                    await postCategoria(novaCategoria);
+                    setNovaCategoria({ descricao: '', ordem: '', url_icone: '' });
+                    carregarCategorias();
+                    exibirMensagem("Categoria criada!", "sucesso");
+                } catch (err) { exibirMensagem("Erro ao inserir", "erro"); }
+            }}>
+                <div className="form-row">
+                    <div className="form-group flex-3">
+                        <label>NOME DA CATEGORIA</label>
+                        <input className="form-control" placeholder="Ex: Lanches" value={novaCategoria.descricao}
+                            onChange={(e) => setNovaCategoria({...novaCategoria, descricao: e.target.value})} />
+                    </div>
+                    <div className="form-group flex-1">
+                        <label>ORDEM</label>
+                        <input type="number" className="form-control" value={novaCategoria.ordem}
+                            onChange={(e) => setNovaCategoria({...novaCategoria, ordem: e.target.value})} />
+                    </div>
                 </div>
-
-                <div className="form-group full">
-                    <label htmlFor="novaUrl">URL do Ícone</label>
-                    <input
-                        id="novaUrl"
-                        className="form-control modal-input"
-                        placeholder="Digite a URL do ícone"
-                        value={novaUrl}
-                        onChange={e => setNovaUrl(e.target.value)}
-                    />
+                <div className="form-row" style={{marginTop: '10px'}}>
+                    <div className="form-group full">
+                        <label>URL DO ÍCONE (IMAGEM)</label>
+                        <input className="form-control" placeholder="Cole o link aqui..." value={novaCategoria.url_icone}
+                            onChange={(e) => setNovaCategoria({...novaCategoria, url_icone: e.target.value})} />
+                    </div>
                 </div>
-
-                <button type="button" className="btn btn-primary" onClick={addCategoria}>
-                    + Adicionar Categoria
-                </button>
+                <button type="submit" className="btn-primary-ifood">+ Adicionar Categoria</button>
             </form>
 
-            <h5>Categorias Existentes:</h5>
+            {/* LISTA DE REGISTROS */}
             <ul id="listaCategorias">
-                {/* Remoção da verificação Array.isArray, pois o estado já é inicializado como [] */}
-                {categorias.map(cat => ( 
-                    <li key={cat.id}>
+                {isLoading ? <p>Buscando no banco...</p> : categorias.map((cat) => (
+                    <li key={cat.id_categoria} className="cat-item">
                         <div className="cat-info">
-                            <img src={cat.url_foto} alt={cat.nome} className="cat-icon" onError={(e) => { e.target.src = 'URL_IMAGEM_PADRAO' }} /> {/* Adicionando fallback para imagem */}
-                            <span>{cat.nome}</span>
+                            <span className="badge-ordem">{cat.ordem}º</span>
+                            <img 
+                                key={`img-${cat.id_categoria}-${cat.url_icone}`}
+                                src={cat.url_icone && cat.url_icone.trim() !== "" ? cat.url_icone : imgDefault} 
+                                alt="" className="cat-icon" 
+                                onError={(e) => { e.target.src = imgDefault; }}
+                            />
+                            <strong>{cat.descricao}</strong>
                         </div>
                         <div className="cat-actions">
-                            <button className="btn-edit" onClick={() => openModal(cat)} title="Editar categoria">✏️</button>
-                            <button className="btn-delete" onClick={() => removeCategoria(cat.id)} title="Apagar categoria">🗑️</button>
+                            <button className="btn-action edit" onClick={() => iniciarEdicao(cat)}>✏️</button>
+                            <button className="btn-action delete" onClick={() => { if(window.confirm("Excluir?")) deleteCategoria(cat.id_categoria).then(carregarCategorias) }}>🗑️</button>
                         </div>
                     </li>
                 ))}
             </ul>
 
-            {modalCat && (
-                <div className="modal-overlay" onClick={() => setModalCat(null)}>
-                    {/* ... (Conteúdo do modal) ... */}
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modal-img-container">
-                            <img src={urlEdit} alt={nomeEdit} className="modal-img" />
-                            <button
-                                className="edit-img-btn"
-                                title="Alterar imagem"
-                                onClick={() => {
-                                    const novaUrlPrompt = prompt("Insira a nova URL do ícone:", urlEdit);
-                                    if (novaUrlPrompt) setUrlEdit(novaUrlPrompt);
-                                }}
-                            >✏️</button>
+            {/* MODAL DE EDIÇÃO */}
+            {editando && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <button className="btn-close-modal" onClick={() => setEditando(null)}>×</button>
+                        <h2 className="modal-title">Editar Categoria</h2>
+                        
+                        <div className="modal-image-container-large">
+                            <img src={editando.url_icone || imgDefault} alt="Preview" className="modal-img-preview-large" 
+                                onError={(e) => { e.target.src = imgDefault; }} />
+                            <div className="pencil-badge-red" onClick={handleUrlPrompt}>✎</div>
                         </div>
 
-                        <div className="modal-form">
-                            <div className="form-group full">
-                                <label>Nome da Categoria</label>
-                                <input type="text" value={nomeEdit} onChange={e => setNomeEdit(e.target.value)} className="modal-input" />
+                        <div className="modal-form-compact">
+                            <div className="modal-row">
+                                <div className="form-group flex-3">
+                                    <label>NOME DA CATEGORIA</label>
+                                    <input className="modal-input" value={editando.descricao}
+                                        onChange={(e) => setEditando({...editando, descricao: e.target.value})} />
+                                </div>
+                                <div className="form-group flex-1">
+                                    <label>ORDEM</label>
+                                    <input type="number" className="modal-input" value={editando.ordem}
+                                        onChange={(e) => setEditando({...editando, ordem: e.target.value})} />
+                                </div>
                             </div>
-
-                            <div className="form-group full">
-                                <label>URL do Ícone</label>
-                                <input type="text" value={urlEdit} onChange={e => setUrlEdit(e.target.value)} className="modal-input" />
+                            <div className="form-group" style={{marginTop: '15px'}}>
+                                <label>URL DA IMAGEM</label>
+                                <input className="modal-input" value={editando.url_icone} 
+                                    onChange={(e) => setEditando({...editando, url_icone: e.target.value})} />
                             </div>
-
-                            <div className="modal-actions">
-                                <button className="btn salvar" onClick={saveEdits}>💾 Salvar</button>
-                                <button className="btn apagar" onClick={() => setModalCat(null)}>❌ Cancelar</button>
+                            <div className="modal-actions-ifood">
+                                <button className="btn-ifood secondary" onClick={() => setEditando(null)}>Cancelar</button>
+                                <button className="btn-ifood primary" onClick={handleSalvarEdicao}>Salvar Alterações</button>
                             </div>
                         </div>
                     </div>

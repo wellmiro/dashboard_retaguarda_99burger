@@ -1,11 +1,5 @@
-// src/api/Api.js
 import axios from "axios";
 
-/**
- * Configuração central da API
- * O header 'ngrok-skip-browser-warning' é essencial para que o navegador
- * não bloqueie a resposta JSON com a página de aviso do ngrok.
- */
 const api = axios.create({
   baseURL: "https://api-99burger.onrender.com",
   headers: {
@@ -14,18 +8,46 @@ const api = axios.create({
   }
 });
 
-// --- Endpoints de Consulta (Dashboard e Listagens) ---
-export const getPedidos = () => api.get("/pedidos");
-export const getProdutos = () => api.get("/produtos");
-export const getDashboard = () => api.get("/dashboard");
+// --- INTERCEPTOR: Injeta o Token do LocalStorage em cada requisição ---
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token"); 
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// --- Endpoints de Gerenciamento de Pedidos (CRUD) ---
+// --- CATEGORIAS ---
+export const getCategorias = () => api.get("/categorias");
+export const postCategoria = (data) => api.post("/categorias", data);
+export const putCategoria = (id, data) => api.put(`/categorias/${id}`, data);
+export const deleteCategoria = (id) => api.delete(`/categorias/${id}`);
+
+// --- PRODUTOS ---
+export const getProdutos = () => api.get("/produtos");
+export const createProduto = (data) => api.post("/produtos", data);
+export const updateProduto = (id, data) => api.put(`/produtos/${id}`, data);
+export const deleteProduto = (id) => api.delete(`/produtos/${id}`);
+
+// --- OPÇÕES E CARDÁPIO ---
+export const createOpcaoProduto = (data) => api.post("/produtos/opcoes", data);
+export const deleteOpcaoProduto = (id) => api.delete(`/produtos/opcoes/${id}`);
+export const getOpcoesProduto = (id_prod) => api.get(`/produtos/cardapio/opcoes/${id_prod}`);
+
+// --- PEDIDOS ---
+export const getPedidos = () => api.get("/pedidos");
 export const addPedido = (data) => api.post("/pedidos", data);
 export const updatePedido = (id, data) => api.put(`/pedidos/${id}`, data);
 export const deletePedido = (id) => api.delete(`/pedidos/${id}`);
 
-// --- Endpoints de Autenticação ---
-// Nota: Se sua API de login estiver em outro servidor, ajuste a URL se necessário.
+// --- USUÁRIOS E AUTH ---
 export const loginUsuario = (email, senha) => api.post("/login", { email, senha });
+export const getUsuario = (id) => api.get(`/usuarios/${id}`);
+
+// --- DASHBOARD ---
+export const getDashboard = () => api.get("/dashboard");
 
 export default api;
