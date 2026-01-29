@@ -9,7 +9,7 @@ import "./Styles.css";
 
 function Inicio() {
   const [filtro, setFiltro] = useState("hoje");
-  const [horaAbertura, setHoraAbertura] = useState("17:00");
+  const [horaAbertura, setHoraAbertura] = useState("08:00");
   const [horaFechamento, setHoraFechamento] = useState("03:50");
   const [usuario, setUsuario] = useState(null); // usuário logado
 
