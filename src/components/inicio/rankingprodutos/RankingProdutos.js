@@ -1,73 +1,114 @@
 import React, { useEffect, useState } from "react";
-import { getPedidos } from "../../../api/Pedidos";
 import "./Styles.css";
 
-// cores fixas para os top 5 (em ordem)
-const coresTop5 = ["#007BFF", "#28A745", "#FFC107", "#DC3545", "#6F42C1"];
+// Cores base para as barras. Se houver mais de 5 categorias, elas se repetem.
+const coresLista = ["#007BFF", "#28A745", "#FFC107", "#DC3545", "#6F42C1", "#17A2B8", "#FD7E14"];
 
-function RankingProdutos() {
-  const [produtosData, setProdutosData] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+function RankingProdutos({ pedidosIniciais }) {
+  const agora = new Date();
+  const primeiroDia = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString().split('T')[0];
+  const hoje = agora.toISOString().split('T')[0];
+
+  const [dataInicio, setDataInicio] = useState(primeiroDia);
+  const [dataFim, setDataFim] = useState(hoje);
+  const [rankingData, setRankingData] = useState([]);
+
+  const parseDataBR = (dt) => {
+    if (!dt) return null;
+    if (dt.includes("-")) return new Date(dt.replace(/-/g, '/'));
+    const [data, hora] = dt.split(" ");
+    const [dia, mes, ano] = data.split("/");
+    return new Date(`${ano}-${mes}-${dia} ${hora || "00:00:00"}`);
+  };
 
   useEffect(() => {
-    getPedidos()
-      .then((res) => {
-        const pedidos = Array.isArray(res.data) ? res.data : res.data?.pedidos || [];
-        const contagemProdutos = {};
+    if (!pedidosIniciais || !Array.isArray(pedidosIniciais)) return;
 
-        pedidos.forEach((pedido) => {
-          const itens = Array.isArray(pedido.itens) ? pedido.itens : pedido.pedido_itens || [];
-          itens.forEach((item) => {
-            const qtd = parseFloat(item.qtd || item.quantidade || 0);
-            const nome = item.nome_produto || item.nome || "Produto Desconhecido";
-            if (contagemProdutos[nome]) {
-              contagemProdutos[nome] += qtd;
-            } else {
-              contagemProdutos[nome] = qtd;
-            }
-          });
+    const faturamentoPorCategoria = {};
+    const inicio = new Date(dataInicio + "T00:00:00");
+    const fim = new Date(dataFim + "T23:59:59");
+
+    pedidosIniciais.forEach((pedido) => {
+      const dtP = parseDataBR(pedido.dt_pedido || pedido.data_pedido);
+      
+      if (dtP && dtP >= inicio && dtP <= fim) {
+        const itens = Array.isArray(pedido.itens) ? pedido.itens : pedido.pedido_itens || [];
+        
+        itens.forEach((item) => {
+          // Usando a mesma lógica de soma dos Cards para bater com o banco (vl_total do item)
+          const valorItem = parseFloat(String(item.vl_total || 0).replace(",", "."));
+          const categoria = item.categoria || item.nome_categoria || "Outros";
+          
+          faturamentoPorCategoria[categoria] = (faturamentoPorCategoria[categoria] || 0) + valorItem;
         });
+      }
+    });
 
-        // transforma em array e ordena decrescente
-        const produtosArray = Object.entries(contagemProdutos)
-          .map(([nome, vendidos]) => ({ nome, vendidos }))
-          .sort((a, b) => b.vendidos - a.vendidos)
-          .slice(0, 5); // top 5
+    const ordenados = Object.entries(faturamentoPorCategoria)
+      .map(([nome, faturamento]) => ({ nome, faturamento }))
+      .sort((a, b) => b.faturamento - a.faturamento);
+      // REMOVIDO O .slice(0, 5) para trazer todas as categorias
 
-        setProdutosData(produtosArray);
-        setLoaded(true);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar pedidos:", err);
-        setProdutosData([]);
-        setLoaded(true);
-      });
-  }, []);
+    setRankingData(ordenados);
+  }, [pedidosIniciais, dataInicio, dataFim]);
 
-  const maxVendidos = Math.max(...produtosData.map((p) => p.vendidos), 0);
+  const maxF = Math.max(...rankingData.map((r) => r.faturamento), 0);
 
   return (
-    <div className="ranking-produtos">
-      <h3>Ranking de Produtos</h3>
-      {produtosData.length > 0 ? (
-        produtosData.map((produto, idx) => (
-          <div className="produto" key={idx}>
-            <span className="nome">{produto.nome}</span>
-            <div className="barra-bg">
-              <div
-                className="barra"
-                style={{
-                  width: loaded ? `${(produto.vendidos / maxVendidos) * 100}%` : "0%",
-                  backgroundColor: coresTop5[idx], // cor pelo índice do ranking
-                }}
-              ></div>
+    <div className="ranking-produtos-container-geral">
+      <div className="ranking-produtos">
+        <div className="ranking-header-filtros">
+          <h3 className="titulo-secao">Faturamento por Categoria</h3>
+          <div className="filtros-container">
+            <div className="filtro-item">
+              <label>De:</label>
+              <input 
+                type="date" 
+                className="input-estilizado"
+                value={dataInicio} 
+                onChange={(e) => setDataInicio(e.target.value)} 
+              />
             </div>
-            <span className="vendidos">{produto.vendidos}</span>
+            <div className="filtro-item">
+              <label>Até:</label>
+              <input 
+                type="date" 
+                className="input-estilizado"
+                value={dataFim} 
+                onChange={(e) => setDataFim(e.target.value)} 
+              />
+            </div>
           </div>
-        ))
-      ) : (
-        <p style={{ textAlign: "center", marginTop: 20 }}>Sem dados para o período</p>
-      )}
+        </div>
+
+        <div className="ranking-corpo">
+          {rankingData.length > 0 ? (
+            rankingData.map((item, idx) => (
+              <div className="linha-ranking" key={idx}>
+                <span className="label-nome">{item.nome}</span>
+                <div className="progresso-bg">
+                  <div
+                    className="progresso-barra"
+                    style={{
+                      width: maxF > 0 ? `${(item.faturamento / maxF) * 100}%` : "0%",
+                      // Usa o operador de resto (%) para ciclar entre as cores se houver muitas categorias
+                      backgroundColor: coresLista[idx % coresLista.length],
+                    }}
+                  ></div>
+                </div>
+                <span className="valor-negrito">
+                  {item.faturamento.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p className="msg-vazia">Nenhum dado encontrado para este período.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,145 +1,97 @@
-// src/components/relatorios/vendas/header/Header.js
 import React, { useState, useEffect, useRef } from 'react';
 import './Styles.css';
 
 function Header({ filtroData, onFiltroChange }) {
+  // Sincroniza os inputs com o que vem do componente pai
   const [startDate, setStartDate] = useState(filtroData.inicio || '');
   const [endDate, setEndDate] = useState(filtroData.fim || '');
   const [mesesAtivos, setMesesAtivos] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(filtroData.tipo);
+  
   const barraRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setStartDate(filtroData.inicio || '');
-    setEndDate(filtroData.fim || '');
-  }, [filtroData]);
-
-  // Gerar meses de Janeiro até mês atual dinamicamente
-  useEffect(() => {
-    const hoje = new Date();
-    const meses = [
-      "Janeiro", "Fevereiro", "Março", "Abril",
-      "Maio", "Junho", "Julho", "Agosto",
-      "Setembro", "Outubro", "Novembro", "Dezembro"
-    ];
-    setMesesAtivos(meses.slice(0, hoje.getMonth() + 1));
+    const mesesFull = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const mesAtualIndex = new Date().getMonth();
+    setMesesAtivos(mesesFull.slice(0, mesAtualIndex + 1));
   }, []);
 
-  const handleFilter = () => {
-    if (onFiltroChange) {
-      onFiltroChange({
-        inicio: startDate || null,
-        fim: endDate || null,
-      });
-    }
-  };
-
-  const animarBarra = (index) => {
+  // Função para mover a barra azul
+  const moverBarra = (index) => {
     if (barraRef.current && containerRef.current) {
-      const btn = containerRef.current.children[index];
-      barraRef.current.style.width = `${btn.offsetWidth}px`;
-      barraRef.current.style.left = `${btn.offsetLeft}px`;
+      const botoes = containerRef.current.querySelectorAll('.btn-nav-vendas');
+      const alvo = botoes[index];
+      if (alvo) {
+        barraRef.current.style.width = `${alvo.offsetWidth}px`;
+        barraRef.current.style.left = `${alvo.offsetLeft}px`;
+        barraRef.current.style.opacity = "1";
+      }
     }
   };
 
+  // Posiciona a barra ao carregar ou mudar o index
+  useEffect(() => {
+    if (mesesAtivos.length > 0) {
+      const timer = setTimeout(() => moverBarra(activeIndex), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [activeIndex, mesesAtivos]);
+
+  // FUNÇÃO CORRIGIDA: Atualiza o gráfico E os campos de data
   const handleMesClick = (index) => {
     setActiveIndex(index);
-    const hoje = new Date();
-    const inicio = new Date(hoje.getFullYear(), index, 1);
-    const fim = new Date(hoje.getFullYear(), index + 1, 0);
-
-    if (onFiltroChange) {
-      onFiltroChange({
-        inicio: inicio.toISOString().split('T')[0],
-        fim: fim.toISOString().split('T')[0],
-      });
-    }
-
-    animarBarra(index);
+    const ano = new Date().getFullYear();
+    const inicio = new Date(ano, index, 1).toISOString().split('T')[0];
+    const fim = new Date(ano, index + 1, 0).toISOString().split('T')[0];
+    
+    // Atualiza os campos visuais (o dd/mm/aaaa que sumiu)
+    setStartDate(inicio);
+    setEndDate(fim);
+    
+    // Avisa o componente pai para atualizar os cards/grafico
+    onFiltroChange({ inicio, fim, tipo: index });
   };
-
-  const handleHojeClick = () => {
-    const index = mesesAtivos.length;
-    setActiveIndex(index);
-
-    const hoje = new Date();
-    const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-    if (onFiltroChange) {
-      onFiltroChange({
-        inicio: inicio.toISOString().split('T')[0],
-        fim: fim.toISOString().split('T')[0],
-      });
-    }
-
-    animarBarra(index);
-  };
-
-  const handleTodosClick = () => {
-    const index = mesesAtivos.length + 1;
-    setActiveIndex(index);
-
-    const hoje = new Date();
-    const inicio = new Date(hoje.getFullYear(), 0, 1);
-    const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-    if (onFiltroChange) {
-      onFiltroChange({
-        inicio: inicio.toISOString().split('T')[0],
-        fim: fim.toISOString().split('T')[0],
-      });
-    }
-
-    animarBarra(index);
-  };
-
-  // Inicializar barra no primeiro mês ou seleção atual
-  useEffect(() => {
-    if (activeIndex === null && containerRef.current && mesesAtivos.length > 0) {
-      animarBarra(0);
-      setActiveIndex(0);
-    }
-  }, [mesesAtivos]);
 
   return (
-    <div className="top-bar">
-      <h1>Vendas Diárias</h1>
-      <div className="filtro">
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        <button onClick={handleFilter}>Filtrar</button>
+    <div className="header-vendas-top">
+      <h1 className="titulo-vendas">Vendas Diárias</h1>
+      
+      <div className="filtro-vendas-inputs">
+        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+        <button className="btn-vendas-filtrar" onClick={() => onFiltroChange({ inicio: startDate, fim: endDate, tipo: 'custom' })}>
+          Filtrar
+        </button>
       </div>
 
-      <div className="botoes-mes-container" ref={containerRef}>
+      <div className="container-nav-vendas" ref={containerRef}>
         {mesesAtivos.map((mes, index) => (
-          <button
-            key={mes}
-            className="btn-mes"
-            onClick={() => handleMesClick(index)}
-          >
+          <button key={mes} className="btn-nav-vendas mes-azul" onClick={() => handleMesClick(index)}>
             {mes}
           </button>
         ))}
+        
+        <button className="btn-nav-vendas hoje-vermelho" onClick={() => {
+          const hoje = new Date().toISOString().split('T')[0];
+          setStartDate(hoje);
+          setEndDate(hoje);
+          setActiveIndex(mesesAtivos.length);
+          onFiltroChange({ inicio: hoje, fim: hoje, tipo: mesesAtivos.length });
+        }}>Hoje</button>
+        
+        <button className="btn-nav-vendas todos-laranja" onClick={() => {
+          const ano = new Date().getFullYear();
+          const hoje = new Date().toISOString().split('T')[0];
+          const inicioAno = `${ano}-01-01`;
+          setStartDate(inicioAno);
+          setEndDate(hoje);
+          const index = mesesAtivos.length + 1;
+          setActiveIndex(index);
+          onFiltroChange({ inicio: inicioAno, fim: hoje, tipo: index });
+        }}>Todos</button>
 
-        <button className="btn-hoje" onClick={handleHojeClick}>
-          Hoje
-        </button>
-
-        <button className="btn-todos" onClick={handleTodosClick}>
-          Todos
-        </button>
-
-        <div className="barra-ativa" ref={barraRef}></div>
+        <div className="pauzinho-azul" ref={barraRef}></div>
       </div>
     </div>
   );

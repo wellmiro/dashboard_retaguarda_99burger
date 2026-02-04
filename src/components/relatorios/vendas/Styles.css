@@ -1,15 +1,16 @@
-/* src/components/relatorios/vendas/Styles.css */
+/* ================= CONTAINER ================= */
 
 .relatorios-container {
   padding: 20px;
-  background-color: #f5f5f5;
+  background: #0f172a;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  font-family: "Inter", Arial, sans-serif;
 }
 
-/* Cards de resumo */
+/* cards */
 .vendas-cards {
   display: flex;
   gap: 20px;
@@ -17,76 +18,55 @@
 }
 
 .vendas-card {
-  background-color: #fff;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #020617;
+  padding: 18px 22px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  border: 1px solid #1e293b;
   flex: 1 1 200px;
-  min-width: 180px;
 }
 
-/* Títulos dentro dos cards */
 .vendas-card h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #333;
+  font-size: 16px;
+  color: #94a3b8;
+  margin-bottom: 6px;
 }
 
-/* Gráfico */
+/* gráfico */
 .vendas-grafico {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #020617;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  border: 1px solid #1e293b;
 }
 
-/* Lista / tabela */
+/* lista */
 .vendas-lista {
-  overflow-x: auto; /* Permite scroll horizontal no mobile */
+  overflow-x: auto;
 }
 
 .vendas-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Força scroll horizontal se necessário */
+  min-width: 600px;
 }
 
 .vendas-table th,
 .vendas-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+  padding: 12px 10px;
+  border-bottom: 1px solid #1e293b;
   font-size: 14px;
 }
 
 .vendas-table th {
-  background-color: #f0f0f0;
-  color: #333;
+  background: #020617;
+  color: #94a3b8;
 }
 
-/* Responsividade */
+/* mobile */
 @media (max-width: 768px) {
-  .relatorios-container {
-    padding: 15px;
-  }
-
   .vendas-cards {
     flex-direction: column;
-    gap: 15px;
-  }
-
-  .vendas-card {
-    flex: 1 1 100%;
-    min-width: auto;
-  }
-
-  .vendas-table th,
-  .vendas-table td {
-    font-size: 12px;
-    padding: 8px;
-  }
-
-  .vendas-grafico {
-    padding: 10px;
   }
 }

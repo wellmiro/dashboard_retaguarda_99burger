@@ -1,83 +1,131 @@
-.ranking-produtos {
-  margin-top: 30px;
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+/* Margem externa para o painel não colar na tela */
+.ranking-produtos-container-geral {
+  padding: 10px 20px 20px 10px; /* Margem Direita e inferior */
   width: 100%;
   box-sizing: border-box;
 }
 
-.ranking-produtos h3 {
-  margin-bottom: 20px;
-  color: #007bff;
-  font-weight: 600;
-  font-size: 1.1rem;
-  text-align: left;
+.ranking-produtos {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Linha de produto */
-.produto {
+.ranking-header-filtros {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.titulo-secao {
+  font-size: 1.2rem;
+  color: #007bff;
+  margin: 0;
+  font-weight: 700;
+}
+
+.filtros-container {
+  display: flex;
+  gap: 15px;
+}
+
+.filtro-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  flex-wrap: nowrap;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
 }
 
-/* Nome do produto */
-.produto .nome {
-  width: 180px;
-  min-width: 150px;
-  font-weight: 600;
+/* Estilo moderno para o Date Time */
+.input-estilizado {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 12px;
+  background-color: #f8f9fa;
+  color: #333;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.input-estilizado:focus {
+  border-color: #007bff;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.linha-ranking {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+.label-nome {
+  width: 120px;
+  font-weight: 700;
   color: #333;
   font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Barra de faturamento */
-.barra-bg {
+.progresso-bg {
   flex: 1;
-  height: 18px;
-  background-color: #e9ecef;
-  border-radius: 10px;
+  height: 22px; /* Barra um pouco mais robusta */
+  background-color: #f0f0f0;
+  border-radius: 11px;
+  margin: 0 15px;
   overflow: hidden;
 }
 
-.barra {
+.progresso-barra {
   height: 100%;
-  border-radius: 10px;
-  transition: width 1s ease-in-out;
+  border-radius: 11px;
+  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Quantidade vendida */
-.quantidade-vendida {
-  width: 60px;
+.valor-negrito {
+  width: 115px;
   text-align: right;
-  font-weight: 700;
+  font-weight: 800;
   color: #222;
   font-size: 0.95rem;
+  padding-right: 5px; /* Segurança para não colar na borda */
 }
 
-/* RESPONSIVO */
+/* Ajustes Mobile */
 @media (max-width: 768px) {
-  .ranking-produtos {
-    padding: 16px;
+  .ranking-produtos-container-geral {
+    padding: 10px;
   }
-
-  .produto {
+  
+  .ranking-header-filtros {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
+  }
+  
+  .linha-ranking {
+    flex-wrap: wrap;
+    margin-bottom: 25px;
   }
 
-  .barra-bg {
+  .label-nome {
     width: 100%;
-    height: 16px;
+    margin-bottom: 8px;
   }
 
-  .quantidade-vendida {
-    align-self: flex-end;
-    font-size: 0.85rem;
-    color: #444;
+  .progresso-bg {
+    margin-left: 0;
+    height: 18px;
   }
 }

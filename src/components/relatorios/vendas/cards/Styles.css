@@ -1,7 +1,5 @@
-/* Styles.css (override definitivo para Cards) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* usar seletor de escopo maior para bater regras globais */
 .dashboard-wrapper .content-container .cards-container,
 .vendas-container .cards-container,
 .main .cards-container,
@@ -16,13 +14,11 @@
   align-items: stretch !important;
 }
 
-/* garante box-sizing */
-.dashboard-wrapper .content-container .cards-container * ,
+.dashboard-wrapper .content-container .cards-container *,
 .cards-container * {
   box-sizing: border-box;
 }
 
-/* card */
 .dashboard-wrapper .content-container .cards-container .card,
 .cards-container .card {
   background: #ffffff !important;
@@ -39,7 +35,6 @@
   overflow: hidden !important;
 }
 
-/* texto */
 .dashboard-wrapper .content-container .cards-container .card h3,
 .cards-container .card h3 {
   margin: 0 !important;
@@ -61,15 +56,11 @@
   line-height: 1.2 !important;
 }
 
-/* bordas coloridas */
 .cards-container .card-total { border-left: 5px solid #10b981 !important; }
 .cards-container .card-pedidos { border-left: 5px solid #f59e0b !important; }
 .cards-container .card-ticket { border-left: 5px solid #ef4444 !important; }
 .cards-container .card-produtos { border-left: 5px solid #3b82f6 !important; }
 
-/* breakpoints */
-
-/* tablet */
 @media (max-width: 1024px) {
   .dashboard-wrapper .content-container .cards-container,
   .cards-container {
@@ -81,7 +72,6 @@
   .cards-container .card p { font-size: 0.88rem !important; }
 }
 
-/* mobile: força 1 coluna — garante que não pareça desktop */
 @media (max-width: 768px) {
   .dashboard-wrapper .content-container .cards-container,
   .cards-container {
@@ -96,7 +86,6 @@
   .cards-container .card p { font-size: 0.82rem !important; }
 }
 
-/* extra small */
 @media (max-width: 420px) {
   .cards-container { gap: 10px !important; }
   .cards-container .card { padding: 10px !important; }

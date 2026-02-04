@@ -1,131 +1,69 @@
-/* src/components/relatorios/vendas/header/Styles.css */
-
-/* Top bar (header) */
-.top-bar {
+.header-vendas-top {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 20px 0; /* topo 0, inferior 20px */
-  flex-wrap: wrap;
-  gap: 15px;
-  font-family: 'Segoe UI', sans-serif;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 25px;
 }
 
-.top-bar h1 {
-  font-size: 28px; /* título principal */
+.titulo-vendas {
+  font-size: 28px;
+  font-weight: bold;
   color: #111827;
   margin: 0;
 }
 
-/* Filtro (inputs, select, botão) */
-.filtro {
+.filtro-vendas-inputs {
   display: flex;
   gap: 15px;
-  flex-wrap: wrap;
   align-items: center;
 }
 
-.filtro input,
-.filtro select,
-.filtro button {
-  font-size: 16px; /* fonte 16 em tudo */
-}
-
-.filtro input,
-.filtro select {
-  padding: 10px 14px; /* tamanho maior para inputs */
-  border-radius: 6px;
+.filtro-vendas-inputs input {
+  padding: 10px;
   border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
-.filtro button {
-  padding: 10px 20px; /* botão maior */
-  border: none;
-  border-radius: 6px;
+.btn-vendas-filtrar {
+  padding: 10px 25px;
   background-color: #3b82f6;
   color: white;
+  border: none;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.filtro button:hover {
-  background-color: #2563eb;
-}
-
-/* Botões de meses */
-.botoes-mes-container {
+.container-nav-vendas {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  padding-bottom: 10px; /* espaço inferior para a barra animada */
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
 }
 
-.botoes-mes-container .btn-mes,
-.botoes-mes-container .btn-hoje,
-.botoes-mes-container .btn-todos {
-  padding: 8px 16px;
+.btn-nav-vendas {
+  padding: 8px 20px;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  position: relative;
-  z-index: 1;
-  transition: color 0.2s, background-color 0.2s;
-}
-
-/* Botões azuis (meses) */
-.botoes-mes-container .btn-mes {
-  background-color: #3b82f6;
   color: white;
+  z-index: 2;
 }
 
-.botoes-mes-container .btn-mes:hover {
-  background-color: #2563eb;
-}
+.mes-azul { background-color: #3b82f6; }
+.hoje-vermelho { background-color: #ef4444; }
+.todos-laranja { background-color: #f59e0b; }
 
-/* Botão Hoje */
-.botoes-mes-container .btn-hoje {
-  background-color: #ef4444; /* vermelho/destaque */
-  color: white;
-}
-
-.botoes-mes-container .btn-hoje:hover {
-  background-color: #b91c1c;
-}
-
-/* Botão Todos */
-.botoes-mes-container .btn-todos {
-  background-color: #f59e0b; /* laranja/destaque */
-  color: white;
-}
-
-.botoes-mes-container .btn-todos:hover {
-  background-color: #d97706; /* laranja mais escuro ao passar o mouse */
-}
-
-/* Barra animada abaixo do botão ativo */
-/* Barra animada abaixo do botão ativo */
-.barra-ativa {
+.pauzinho-azul {
   position: absolute;
-  bottom: -6px; /* distância para não grudar no botão */
-  height: 4px; /* mais visível */
-  background-color: #3b82f6; /* azul igual aos botões de mês */
+  bottom: -2px;
+  height: 4px;
+  background-color: #3b82f6;
   border-radius: 2px;
   transition: all 0.3s ease;
-  z-index: 0;
-}
-
-/* Responsividade */
-@media(max-width: 768px) {
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .botoes-mes-container {
-    justify-content: flex-start;
-  }
+  opacity: 0;
+  z-index: 1;
 }

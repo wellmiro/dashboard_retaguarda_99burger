@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { getPedidos } from "../../../api/Pedidos";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +11,6 @@ import {
 } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import "./Styles.css";
 
 ChartJS.register(
   CategoryScale,
@@ -24,22 +22,21 @@ ChartJS.register(
   ChartDataLabels
 );
 
-function Grafico({ filtro = "hoje", horaAbertura = "17:00", horaFechamento = "03:50" }) {
+function Grafico({ filtro = "hoje", horaAbertura = "08:00", horaFechamento = "03:50" }) {
   const [barData, setBarData] = useState({
     labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
-    datasets: [
-      {
-        label: "Faturamento (R$)",
-        data: [0, 0, 0, 0, 0, 0, 0],
-        backgroundColor: "rgba(0,123,255,0.8)",
-        borderRadius: 6,
-      },
-    ],
+    datasets: [{
+      label: "Faturamento (R$)",
+      data: [0, 0, 0, 0, 0, 0, 0],
+      backgroundColor: "rgba(0,123,255,0.8)",
+      borderRadius: 6,
+    }],
   });
 
   const [formasData, setFormasData] = useState({ labels: [], datasets: [] });
   const [formasValores, setFormasValores] = useState({});
 
+  // Helper para converter string de data para objeto Date
   const parseDataBR = (dt) => {
     if (!dt) return null;
     if (dt.includes("/")) {
@@ -50,153 +47,177 @@ function Grafico({ filtro = "hoje", horaAbertura = "17:00", horaFechamento = "03
     return new Date(dt);
   };
 
-  const isDentroTurno = (dataPedido) => {
-    const abertura = horaAbertura.split(":").map(Number);
-    const fechamento = horaFechamento.split(":").map(Number);
+  /**
+   * Determina a "Data de Negócio" de um pedido com base no turno.
+   * Se o turno fecha às 03:50 e o pedido é 01:00 da manhã, ele volta 1 dia
+   * para contar no faturamento do dia em que a loja abriu.
+   */
+  const getDataDeNegocio = (dataPedido) => {
+    const d = new Date(dataPedido);
+    const hora = d.getHours();
+    const min = d.getMinutes();
+    const [hF] = horaFechamento.split(":").map(Number);
+    const [mF] = horaFechamento.split(":").map(Number);
 
-    const inicio = new Date(dataPedido);
-    const fim = new Date(dataPedido);
+    const minutosPedido = hora * 60 + min;
+    const minutosFechamento = hF * 60 + mF;
 
-    inicio.setHours(abertura[0], abertura[1], 0, 0);
-    fim.setHours(fechamento[0], fechamento[1], 59, 999);
-    if (fim <= inicio) fim.setDate(fim.getDate() + 1);
-
-    return dataPedido >= inicio && dataPedido <= fim;
+    // Se o pedido foi feito entre 00:00 e o horário de fechamento (ex: 03:50)
+    // ele pertence ao dia anterior.
+    if (minutosPedido <= minutosFechamento) {
+      d.setDate(d.getDate() - 1);
+    }
+    return d.toDateString();
   };
 
   useEffect(() => {
     getPedidos()
       .then((res) => {
         const pedidos = Array.isArray(res.data) ? res.data : res.data?.pedidos || [];
+        
+        // --- 1. PROCESSAMENTO DO GRÁFICO DE BARRAS (7 DIAS) ---
+        const faturamentoPorDiaNegocio = {};
+        
+        pedidos.forEach(p => {
+          const dtOriginal = parseDataBR(p.dt_pedido || p.data_pedido);
+          if (!dtOriginal) return;
 
-        // GRÁFICO DE BARRAS - últimos 7 dias
+          const diaNegocio = getDataDeNegocio(dtOriginal);
+          const valor = parseFloat(String(p.vl_total || 0).replace(",", "."));
+          
+          faturamentoPorDiaNegocio[diaNegocio] = (faturamentoPorDiaNegocio[diaNegocio] || 0) + valor;
+        });
+
         const valoresBar = [0, 0, 0, 0, 0, 0, 0];
-        const labelsBar = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+        const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        const labelsExibicao = [];
 
         for (let i = 6; i >= 0; i--) {
-          const dia = new Date();
-          dia.setDate(dia.getDate() - i);
-
-          pedidos.forEach((p) => {
-            const dt = parseDataBR(p.dt_pedido || p.data_pedido);
-            if (!dt) return;
-            if (dt.getHours() < parseInt(horaAbertura.split(":")[0])) dt.setDate(dt.getDate() - 1);
-            if (!isDentroTurno(dt)) return;
-            if (dt.toDateString() === dia.toDateString()) {
-              const index = dt.getDay() === 0 ? 6 : dt.getDay() - 1;
-              valoresBar[index] += parseFloat(p.vl_total || 0);
-            }
-          });
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const chave = d.toDateString();
+          
+          // O índice no array final (0-6) mapeado para Seg-Dom
+          // dt.getDay(): 0=Dom, 1=Seg... Ajustando para Seg=0
+          const diaIndex = d.getDay();
+          const pos = diaIndex === 0 ? 6 : diaIndex - 1;
+          
+          valoresBar[pos] = faturamentoPorDiaNegocio[chave] || 0;
+          labelsExibicao[pos] = diasSemana[diaIndex];
         }
 
-        setBarData((prev) => ({
-          ...prev,
-          datasets: [{ ...prev.datasets[0], data: valoresBar }],
-        }));
+        setBarData({
+          labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+          datasets: [{
+            label: "Faturamento (R$)",
+            data: valoresBar,
+            backgroundColor: "rgba(0,123,255,0.8)",
+            borderRadius: 6,
+          }],
+        });
 
-        // GRÁFICO DE PIZZA - apenas o dia filtrado
-        const dataPizza =
-          filtro === "hoje"
-            ? new Date()
-            : new Date(new Date().setDate(new Date().getDate() - 1));
+        // --- 2. PROCESSAMENTO DO GRÁFICO DE PIZZA (HOJE OU ONTEM) ---
+        const targetDate = new Date();
+        if (filtro === "ontem") targetDate.setDate(targetDate.getDate() - 1);
+        const targetChave = targetDate.toDateString();
 
         const formasMap = new Map();
-
         pedidos.forEach((p) => {
-          const dt = parseDataBR(p.dt_pedido || p.data_pedido);
-          if (!dt) return;
-          if (dt.getHours() < parseInt(horaAbertura.split(":")[0])) dt.setDate(dt.getDate() - 1);
-          if (dt.toDateString() !== dataPizza.toDateString()) return;
-          if (!isDentroTurno(dt)) return;
+          const dtOriginal = parseDataBR(p.dt_pedido || p.data_pedido);
+          if (!dtOriginal) return;
 
-          const forma = p.forma_pagamento || "Não Informado";
-          const valor = parseFloat(p.vl_total || 0);
-          formasMap.set(forma, (formasMap.get(forma) || 0) + valor);
+          if (getDataDeNegocio(dtOriginal) === targetChave) {
+            const forma = p.forma_pagamento || "Não Informado";
+            const valor = parseFloat(String(p.vl_total || 0).replace(",", "."));
+            formasMap.set(forma, (formasMap.get(forma) || 0) + valor);
+          }
         });
 
         const labels = Array.from(formasMap.keys());
-        const data = Array.from(formasMap.values());
-        const colors = ["#007BFF", "#28a745", "#ffc107", "#dc3545", "#6c757d"];
+        const dataPizza = Array.from(formasMap.values());
+        const colors = ["#007BFF", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#888"];
 
         setFormasData({
           labels,
-          datasets: [
-            {
-              label: "Faturamento por Forma de Pagamento",
-              data,
-              backgroundColor: colors.slice(0, labels.length),
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{
+            data: dataPizza,
+            backgroundColor: colors.slice(0, labels.length),
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }],
         });
 
         const valoresObj = {};
-        labels.forEach((lbl, i) => (valoresObj[lbl] = data[i]));
+        labels.forEach((lbl, i) => (valoresObj[lbl] = dataPizza[i]));
         setFormasValores(valoresObj);
       })
       .catch((err) => console.error("Erro ao buscar pedidos:", err));
-  }, [filtro, horaAbertura, horaFechamento]);
+  }, [filtro, horaFechamento]); // Removido horaAbertura pois o fechamento define a virada
 
-  const formatValue = (value) => `R$ ${value.toFixed(2)}`;
+  const formatValue = (value) => value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
   const barOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
+    layout: { padding: { top: 35 } },
+    scales: { 
+        x: { grid: { display: false } }, 
+        y: { beginAtZero: true, grid: { color: "rgba(0,0,0,0.05)" } } 
+    },
     plugins: {
       legend: { display: false },
       datalabels: {
         anchor: "end",
-        align: "end",
-        color: "#333",
-        font: { weight: "bold", size: 11 },
-        formatter: formatValue,
+        align: "top",
+        color: "#444",
+        font: { weight: "bold", size: 10 },
+        formatter: (v) => v > 0 ? formatValue(v) : "",
       },
-      tooltip: { callbacks: { label: (ctx) => formatValue(ctx.parsed.y) } },
     },
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { position: "top", labels: { boxWidth: 12, padding: 15, font: { size: 11 } } },
+      datalabels: { display: false }
+    },
+    cutout: "65%"
   };
 
   return (
     <div className="grafico-row">
-      {/* GRÁFICO DE BARRAS */}
       <div className="grafico-container">
-        <h4>
-          📊 Faturamento últimos 7 dias (Turno {horaAbertura}→{horaFechamento})
-        </h4>
-        <div className="grafico-wrapper">
+        <h4>📊 Faturamento últimos 7 dias (Turno até {horaFechamento})</h4>
+        <div className="grafico-wrapper bar-chart">
           <Bar data={barData} options={barOptions} />
         </div>
       </div>
 
-      {/* GRÁFICO DE PIZZA */}
       <div className="grafico-container">
-        <h4>
-          💳 Faturamento por Forma de Pagamento ({filtro === "hoje" ? "Hoje" : "Ontem"})
-        </h4>
-        <div className="grafico-wrapper">
+        <h4>💳 Formas de Pagamento ({filtro === "hoje" ? "Hoje" : "Ontem"})</h4>
+        <div className="grafico-wrapper pie-chart">
           {formasData.labels.length > 0 ? (
             <>
-              <Doughnut data={formasData} />
-              <div className="legenda-pizza" style={{ marginTop: 20 }}>
+              <Doughnut data={formasData} options={doughnutOptions} />
+              <div className="legenda-pizza">
                 {formasData.labels.map((lbl, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: 4,
-                    }}
-                  >
-                    <span>{lbl}:</span>
-                    <span>{formatValue(formasValores[lbl])}</span>
+                  <div key={i} className="legenda-item">
+                    <span className="legenda-label">{lbl}:</span>
+                    <span className="legenda-valor">{formatValue(formasValores[lbl] || 0)}</span>
                   </div>
                 ))}
+                <div className="legenda-item total-pizza" style={{ borderTop: '1px solid #eee', marginTop: '5px', fontWeight: 'bold' }}>
+                  <span className="legenda-label">TOTAL:</span>
+                  <span className="legenda-valor">
+                    {formatValue(Object.values(formasValores).reduce((a, b) => a + b, 0))}
+                  </span>
+                </div>
               </div>
             </>
           ) : (
-            <p style={{ textAlign: "center", marginTop: 50 }}>
-              Sem dados para o período selecionado
-            </p>
+            <p className="msg-vazia">Sem dados para o período</p>
           )}
         </div>
       </div>

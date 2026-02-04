@@ -27,8 +27,14 @@
     gap: 6px;
 }
 
-/* Inputs e selects */
+/* Classe que empurra o filtro para a direita */
+.filtro-data-direita {
+    margin-left: auto;
+}
+
+/* Inputs e selects - Estilo unificado para tempo, data e select */
 .filtros input[type="time"],
+.filtros input[type="date"],
 .filtros select {
     padding: 8px 12px;
     border-radius: 6px;
@@ -39,16 +45,18 @@
     min-width: 130px;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: inherit;
 }
 
-/* Efeito ao focar */
+/* Efeito azul ao focar nos campos */
 .filtros input[type="time"]:focus,
+.filtros input[type="date"]:focus,
 .filtros select:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-/* Select personalizado */
+/* Select personalizado com a setinha */
 .filtros select {
     cursor: pointer;
     appearance: none;
@@ -83,7 +91,6 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
-/* ======== CONTEÚDO DO CARD ======== */
 .card-left {
     display: flex;
     align-items: center;
@@ -120,41 +127,12 @@
 .card.bg-primary { background-color: #007BFF; color: #fff; }
 
 /* ======== RESPONSIVIDADE ======== */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .cards-row {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 18px;
-    }
-
-    .card-icon { font-size: 1.8rem; }
-    .card-value { font-size: 1.4rem; }
-    .card-label { font-size: 0.85rem; }
-}
-
 @media (max-width: 768px) {
-    .cards-row {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
-    }
-
-    .card {
-        padding: 15px;
-    }
-
-    .card-left {
-        gap: 10px;
-    }
-
-    .card-icon { font-size: 1.5rem; }
-    .card-value { font-size: 1.2rem; }
-    .card-label { font-size: 0.8rem; }
-
     .filtros {
         flex-direction: column;
         align-items: stretch;
     }
-
-    .filtros label {
-        width: 100%;
+    .filtro-data-direita {
+        margin-left: 0;
     }
 }

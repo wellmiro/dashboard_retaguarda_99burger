@@ -9,6 +9,8 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
   const [taxaEntrega, setTaxaEntrega] = useState(0);
   const [produtosVendidos, setProdutosVendidos] = useState(0);
 
+  const [dataEspecifica, setDataEspecifica] = useState(new Date().toISOString().split('T')[0]);
+
   const parseDataBR = (dt) => {
     if (!dt) return null;
     if (dt.includes("-")) return new Date(dt);
@@ -19,20 +21,25 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
   };
 
   const getIntervalo = () => {
-    const agora = new Date();
     let inicio = new Date();
     let fim = new Date();
 
     if (filtro === "hoje") {
-      inicio.setHours(...horaAbertura.split(":"), 0, 0);
-      fim.setHours(...horaFechamento.split(":"), 59, 999);
-      if (fim.getTime() <= inicio.getTime()) fim.setDate(fim.getDate() + 1);
+      inicio = new Date();
     } else if (filtro === "ontem") {
       inicio.setDate(inicio.getDate() - 1);
-      fim.setDate(fim.getDate() - 1);
-      inicio.setHours(...horaAbertura.split(":"), 0, 0);
-      fim.setHours(...horaFechamento.split(":"), 59, 999);
-      if (fim.getTime() <= inicio.getTime()) fim.setDate(fim.getDate() + 1);
+    } else if (filtro === "data_especifica") {
+      const [ano, mes, dia] = dataEspecifica.split("-");
+      inicio = new Date(ano, mes - 1, dia);
+    }
+
+    const dataBaseFim = new Date(inicio);
+    inicio.setHours(...horaAbertura.split(":"), 0, 0);
+    fim = dataBaseFim;
+    fim.setHours(...horaFechamento.split(":"), 59, 999);
+
+    if (fim.getTime() <= inicio.getTime()) {
+      fim.setDate(fim.getDate() + 1);
     }
 
     return { inicio, fim };
@@ -41,9 +48,7 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
   useEffect(() => {
     getPedidos()
       .then((res) => {
-        // Garante que sempre seja um array
         const pedidos = Array.isArray(res.data) ? res.data : res.data?.pedidos || [];
-
         const { inicio, fim } = getIntervalo();
 
         const pedidosPeriodo = pedidos.filter((p) => {
@@ -74,8 +79,7 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
           return (
             acc +
             itens.reduce(
-              (subAcc, item) =>
-                subAcc + parseFloat(item.qtd || item.quantidade || 0),
+              (subAcc, item) => subAcc + parseFloat(item.qtd || item.quantidade || 0),
               0
             )
           );
@@ -83,7 +87,25 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
         setProdutosVendidos(totalProdutos);
       })
       .catch((err) => console.error("Erro ao buscar pedidos:", err));
-  }, [filtro, horaAbertura, horaFechamento]);
+  }, [filtro, horaAbertura, horaFechamento, dataEspecifica]);
+
+  const handleDateChange = (e) => {
+    const novaData = e.target.value;
+    setDataEspecifica(novaData);
+    
+    const hoje = new Date().toISOString().split('T')[0];
+    const ontem = new Date();
+    ontem.setDate(ontem.getDate() - 1);
+    const ontemStr = ontem.toISOString().split('T')[0];
+
+    if (novaData === hoje) {
+      setFiltro("hoje");
+    } else if (novaData === ontemStr) {
+      setFiltro("ontem");
+    } else {
+      setFiltro("data_especifica");
+    }
+  };
 
   return (
     <div className="cards-wrapper">
@@ -93,8 +115,10 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
           <select value={filtro} onChange={(e) => setFiltro(e.target.value)}>
             <option value="hoje">Hoje</option>
             <option value="ontem">Ontem</option>
+            <option value="data_especifica">Data Específica</option>
           </select>
         </label>
+        
         <label>
           Abertura:
           <input
@@ -103,12 +127,23 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
             onChange={(e) => setHoraAbertura(e.target.value)}
           />
         </label>
+
         <label>
           Fechamento:
           <input
             type="time"
             value={horaFechamento}
             onChange={(e) => setHoraFechamento(e.target.value)}
+          />
+        </label>
+
+        {/* AJUSTE AQUI: Removi o estilo manual para ele usar o CSS da classe .filtros */}
+        <label className="filtro-data-direita">
+          Filtrar dia:
+          <input
+            type="date"
+            value={dataEspecifica}
+            onChange={handleDateChange}
           />
         </label>
       </div>
