@@ -1,109 +1,129 @@
-/* ======== CONTAINER PRINCIPAL (UM EMBAIXO DO OUTRO) ======== */
+/* ======== SESSÃO DE GRÁFICOS (ISOLADA) ======== */
 .grafico-row {
-  display: flex !important;
-  flex-direction: column !important; /* Força um embaixo do outro */
-  gap: 30px !important;
-  margin-top: 20px !important;
-  width: 100% !important;
-  text-transform: none !important; /* Mata o maiúsculo global */
-}
-
-.grafico-container {
-  background-color: #ffffff !important;
-  padding: 25px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid #eee !important;
-}
-
-/* Títulos: Pequenos e alinhados */
-.grafico-container h4 {
-  margin: 0 0 20px 0 !important;
-  font-size: 16px !important;
-  color: #333 !important;
-  font-weight: 700 !important;
+  display: grid;
+  grid-template-columns: 1fr; /* SEMPRE UM EMBAIXO DO OUTRO */
+  gap: 25px;
+  margin-top: 25px;
+  width: 100%;
   text-transform: none !important;
-  padding-bottom: 10px !important;
-  border-bottom: 1px solid #f0f0f0 !important;
 }
 
-/* ======== WRAPPERS ======== */
-.grafico-wrapper.bar-chart {
-  height: 300px !important;
-  width: 100% !important;
+/* ======== CONTAINER ======== */
+.grafico-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
 }
 
-.grafico-wrapper.pie-chart {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
+/* ======== TÍTULOS ======== */
+.grafico-container h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 700;
+  text-transform: none !important;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
 }
 
-/* ======== TABELA DE FECHAMENTO (LIMPA) ======== */
+/* ======== LEGENDA / TABELA ======== */
 .legenda-pizza {
-  width: 100% !important;
-  max-width: 500px !important; /* Não deixa a lista espalhar demais no PC */
-  margin-top: 20px !important;
-  background: #f9fafb !important;
-  border-radius: 10px !important;
-  padding: 15px !important;
-  border: 1px solid #e2e8f0 !important;
+  width: 100%;
+  margin-top: 20px;
+  background: #fcfcfc;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #f0f0f0;
 }
 
 .legenda-item {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 12px 5px !important;
-  border-bottom: 1px solid #edf2f7 !important;
-  text-transform: none !important; /* Garante letras minúsculas */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  text-transform: none !important;
 }
 
-.legenda-item:last-of-type {
-  border-bottom: none !important;
+.legenda-item:last-child {
+  border-bottom: none;
 }
 
 .legenda-label {
-  color: #64748b !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .legenda-valor {
-  color: #1a202c !important;
-  font-weight: 700 !important;
-  font-size: 14px !important;
-  font-family: Arial, sans-serif !important;
+  color: #222;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ======== DESTAQUE DO TOTAL (O FECHAMENTO) ======== */
+/* ======== TOTAL ======== */
 .total-pizza {
-  margin-top: 10px !important;
-  background-color: #ffffff !important;
-  border-radius: 8px !important;
+  margin-top: 10px;
+  background-color: #f0f7ff;
+  border-radius: 8px;
   padding: 15px 10px !important;
-  border: 2px solid #007bff !important; /* Destaque azul */
-  display: flex !important;
-  justify-content: space-between !important;
+  border: 1px solid #c2e0ff !important;
+  display: flex;
+  justify-content: space-between;
 }
 
 .total-pizza .legenda-label {
-  color: #007bff !important;
-  font-weight: 800 !important;
-  font-size: 13px !important;
-  text-transform: uppercase !important; /* Só o "TOTAL" em maiúsculo se preferir */
+  color: #0056b3;
+  font-weight: 800;
+  font-size: 0.9rem;
 }
 
 .total-pizza .legenda-valor {
-  color: #007bff !important;
-  font-size: 16px !important;
-  font-weight: 800 !important;
+  color: #0056b3;
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
-/* MENSAGEM VAZIA */
+/* ======== REMOVE LAYOUT LADO A LADO ======== */
+@media (min-width: 1100px) {
+  .grafico-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ======== MENSAGEM VAZIA ======== */
 .msg-vazia {
-  padding: 40px !important;
-  color: #999 !important;
-  font-size: 14px !important;
-  text-align: center !important;
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* ======== LOADING ======== */
+.loading-inline {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
