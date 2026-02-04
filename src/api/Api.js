@@ -20,6 +20,19 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// --- INTERCEPTOR DE RESPOSTA: Captura erro 401 e 403 (Token inválido/expirado) ---
+api.interceptors.response.use(
+  (response) => response, 
+  (error) => {
+    // Se a API retornar 401 ou 403 (Forbidden), limpa tudo e manda pro login
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.clear();
+      window.location.href = "/login"; 
+    }
+    return Promise.reject(error);
+  }
+);
+
 // --- CATEGORIAS ---
 export const getCategorias = () => api.get("/categorias");
 export const postCategoria = (data) => api.post("/categorias", data);
