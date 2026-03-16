@@ -2,7 +2,8 @@ import React, { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome, FaStore, FaChartBar, FaFileInvoiceDollar,
-  FaBoxOpen, FaCashRegister, FaCog, FaBars, FaSignOutAlt, FaChevronDown
+  FaBoxOpen, FaCashRegister, FaCog, FaBars, FaSignOutAlt, FaChevronDown,
+  FaWallet // Importei esse ícone novo para diferenciar
 } from "react-icons/fa";
 import { MdOutlineDns } from "react-icons/md";
 import "./Styles.css";
@@ -17,7 +18,6 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleMobileSidebar = () => setMobileOpen(!mobileOpen);
   
-  // Usamos useCallback para otimizar o handleSubmenuClick
   const handleSubmenuClick = useCallback((menu) =>
     setOpenSubmenu(openSubmenu === menu ? null : menu), [openSubmenu]);
 
@@ -28,45 +28,31 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
     setMobileOpen(false);
   };
 
-  // Funçao de navegação corrigida com setTimeout e useCallback
   const goTo = useCallback((path) => {
     navigate(path);
-
-    // Lógica para Desktop (imediata)
     if (window.innerWidth >= 769) {
-      if (isCollapsed) {
-        setIsCollapsed(false);
-      }
+      if (isCollapsed) setIsCollapsed(false);
       setOpenSubmenu(null); 
-    } 
-    
-    // Lógica para Mobile (com atraso - ESSENCIAL)
-    else {
+    } else {
       setTimeout(() => {
-        setMobileOpen(false); // Fecha o menu mobile após a navegação
-        setOpenSubmenu(null); // Fecha o submenu
+        setMobileOpen(false);
+        setOpenSubmenu(null);
       }, 100); 
     }
-    
   }, [navigate, isCollapsed, setIsCollapsed]);
 
-  const gerenciarAtivo = ['/pedidos', '/performace', '/faturas'].some(path =>
-    location.pathname.startsWith(path)
+  const gerenciarAtivo = ['/pedidos', '/performace', '/faturas', '/receita-despesa'].some(path =>
+    location.pathname === path
   );
   const relatoriosAtivo = ['/vendas', '/estoque', '/financeiro'].some(path =>
-    location.pathname.startsWith(path)
+    location.pathname === path
   );
 
   const gerenciarAberto = openSubmenu === "gerenciarLoja" || gerenciarAtivo;
   const relatoriosAberto = openSubmenu === "relatorios" || relatoriosAtivo;
 
   const renderLink = (path, icon, text, isSubItem = false) => {
-    let isActive = location.pathname === path;
-    if (path !== '/' && location.pathname.startsWith(path)) {
-      isActive = true;
-    }
-
-    // A classe `submenu-item` é nova para dar um estilo diferente
+    const isActive = location.pathname === path;
     const itemClass = isSubItem ? "mobile-link submenu-item" : "mobile-link";
 
     return (
@@ -88,10 +74,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
         </button>
       </div>
 
-      {/* Usando uma nova classe para o header do sidebar */}
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
-             <span className="logo-text">Dashboard</span> {/* Título ou Logo */}
+             <span className="logo-text">Dashboard</span>
             <div className="toggle-button" onClick={toggleSidebar}>
               <FaBars />
             </div>
@@ -99,13 +84,10 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
 
         <nav className="sidebar-nav">
           <ul>
-            <li>{renderLink("/", <FaHome />, "Início")}</li>
+            <li>{renderLink("/inicio", <FaHome />, "Início")}</li>
 
             <li className="menu-group">
-              <div
-                className={`menu-item-with-arrow ${gerenciarAberto ? "active" : ""}`}
-                onClick={() => handleSubmenuClick("gerenciarLoja")}
-              >
+              <div className={`menu-item-with-arrow ${gerenciarAberto ? "active" : ""}`} onClick={() => handleSubmenuClick("gerenciarLoja")}>
                 <div className="menu-item">
                   <span className="icon"><FaStore /></span>
                   <span className="text">Gerenciar Loja</span>
@@ -116,16 +98,15 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
                 <li>{renderLink("/pedidos", <MdOutlineDns />, "Pedidos", true)}</li>
                 <li>{renderLink("/performace", <FaChartBar />, "Performance", true)}</li>
                 <li>{renderLink("/faturas", <FaFileInvoiceDollar />, "Faturas", true)}</li>
+                {/* ÍCONE ALTERADO AQUI PARA NÃO CONFUNDIR COM FATURAS */}
+                <li>{renderLink("/receita-despesa", <FaWallet />, "Receita / Despesa", true)}</li>
               </ul>
             </li>
 
             <li className="menu-group">
-              <div
-                className={`menu-item-with-arrow ${relatoriosAberto ? "active" : ""}`}
-                onClick={() => handleSubmenuClick("relatorios")}
-              >
+              <div className={`menu-item-with-arrow ${relatoriosAberto ? "active" : ""}`} onClick={() => handleSubmenuClick("relatorios")}>
                 <div className="menu-item">
-                  <span className="icon"><FaFileInvoiceDollar /></span>
+                  <span className="icon"><FaChartBar /></span>
                   <span className="text">Relatórios</span>
                 </div>
                 <span className={`arrow ${relatoriosAberto ? "open" : ""}`}><FaChevronDown /></span>

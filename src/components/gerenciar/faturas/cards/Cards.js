@@ -1,4 +1,3 @@
-// src/components/gerenciar/faturas/Cards.js
 import React from 'react';
 import './Styles.css';
 
@@ -6,7 +5,7 @@ function Cards() {
   return (
     <div className="top-panel">
       <div className="card-status card-paid">
-        <h3>4</h3>
+        <h3>8</h3>
         <p>Pagas</p>
       </div>
       <div className="card-status card-pending">

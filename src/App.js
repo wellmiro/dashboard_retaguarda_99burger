@@ -10,15 +10,17 @@ import Financeiro from "./components/relatorios/financeiro/Financeiro";
 import ProdutoEstoque from "./components/produto_estoque/ProdutoEstoque";
 import Login from "./components/login/Login";
 
+// AQUI ESTÁ A MUDANÇA:
+// Importamos o arquivo .jsx (que é a tela/página)
+import PaginaDespesa from "./components/gerenciar/receita_despesa/despesa.jsx"; 
+
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./App.css";
 
 function App() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  // Transformamos em estado para o React "perceber" a mudança
   const [user, setUser] = useState(localStorage.getItem("id_usuario")); 
 
-  // Função para atualizar o estado quando logar
   const handleLoginSuccess = () => {
     setUser(localStorage.getItem("id_usuario"));
   };
@@ -26,12 +28,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={user ? <Navigate to="/inicio" /> : <Navigate to="/login" />}
-        />
-
-        {/* Passamos a função para o Login avisar o App que deu certo */}
+        <Route path="/" element={user ? <Navigate to="/inicio" /> : <Navigate to="/login" />} />
         <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
 
         <Route
@@ -45,9 +42,13 @@ function App() {
                     <Route path="/inicio" element={<Inicio />} />
                     <Route path="/performace" element={<PerformaceGeral />} />
                     <Route path="/faturas" element={<Faturas />} />
+                    <Route path="/financeiro" element={<Financeiro />} /> 
+                    
+                    {/* AQUI: Usamos o componente da página .jsx */}
+                    <Route path="/receita-despesa" element={<PaginaDespesa />} /> 
+                    
                     <Route path="/vendas" element={<Vendas />} />
                     <Route path="/estoque" element={<Estoque />} />
-                    <Route path="/financeiro" element={<Financeiro />} />
                     <Route path="/produto-estoque" element={<ProdutoEstoque />} />
                     <Route path="*" element={<Navigate to="/inicio" />} />
                   </Routes>
