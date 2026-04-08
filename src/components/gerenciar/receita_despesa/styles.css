@@ -10,7 +10,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px; /* Aumentado para desgrudar */
+    margin-bottom: 30px;
 }
 
 .header-financeiro h1 { 
@@ -23,7 +23,7 @@
 /* BOTÕES */
 .acoes-topo { 
     display: flex; 
-    gap: 15px; /* Desgrudado conforme imagem */
+    gap: 15px; 
 }
 
 .btn-principal {
@@ -58,17 +58,12 @@
     transition: all 0.2s ease;
 }
 
-.btn-outline:hover {
-    background-color: #f7fafc;
-    border-color: #cbd5e0;
-}
-
-/* FILTROS - AJUSTE PARA NÃO FICAR FEIO/GRUDADO */
+/* FILTROS */
 .filtros-topo {
     display: flex;
     gap: 30px;
     background: #fff;
-    padding: 25px; /* Aumentado o respiro */
+    padding: 25px; 
     border-radius: 12px;
     margin-bottom: 25px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.02);
@@ -139,54 +134,19 @@
     border-bottom: 1px solid #f7fafc;
 }
 
-.ponto-cor { width: 10px; height: 10px; border-radius: 50%; }
-.legenda-cor-txt { display: flex; align-items: center; gap: 8px; }
-.txt-cat { font-size: 13px; color: #4a5568; }
-.val-cat { font-size: 13px; font-weight: 700; color: #2d3748; }
-
 /* TABELA */
 .card-tabela { background: #fff; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow: hidden; }
 .tabela-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf2f7; }
-
-.btn-group { display: flex; background: #edf2f7; padding: 4px; border-radius: 10px; }
-.btn-group button { 
-    border: none; padding: 8px 18px; background: transparent; cursor: pointer; 
-    border-radius: 8px; font-weight: 700; color: #718096; transition: 0.2s; 
-}
-.btn-group button.active { background: #fff; color: #ea1d2c; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
 .tabela-v { width: 100%; border-collapse: collapse; }
 .tabela-v th { text-align: left; padding: 18px; background: #fcfcfc; color: #a0aec0; font-size: 11px; text-transform: uppercase; font-weight: 800; }
 .tabela-v td { padding: 18px; border-bottom: 1px solid #f7fafc; font-size: 14px; color: #4a5568; }
 
-.txt-valor-negativo { color: #e53e3e !important; font-weight: 700; }
-
 .badge-status { padding: 5px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; }
 .badge-status.A { background: #fff5f5; color: #ea1d2c; }
 .badge-status.P { background: #f0fff4; color: #2ecc71; }
 
-/* AÇÕES COM ÍCONES */
-.tabela-acoes-icones { display: flex; gap: 8px; }
-
-.btn-icon {
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-icon.editar { background-color: #ebf8ff; color: #3182ce; }
-.btn-icon.editar:hover { background-color: #3182ce; color: #fff; }
-
-.btn-icon.excluir { background-color: #fff5f5; color: #e53e3e; }
-.btn-icon.excluir:hover { background-color: #e53e3e; color: #fff; }
-
-/* MODAIS - AJUSTE FORM-ROW E LARGURA */
+/* MODAIS */
 .modal-overlay { 
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
     background: rgba(0,0,0,0.6); display: flex; align-items: center; 
@@ -194,81 +154,50 @@
 }
 
 .modal-content { 
-    background: #fff; padding: 35px; border-radius: 20px; width: 500px; /* Um pouco mais largo */
+    background: #fff; padding: 35px; border-radius: 20px; width: 500px;
     box-shadow: 0 20px 25px rgba(0,0,0,0.1); 
 }
 
-.modal-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-.modal-header-flex h2 { margin: 0; font-size: 22px; font-weight: 700; }
-
-.btn-fechar-modal { background: none; border: none; color: #a0aec0; cursor: pointer; }
-
-.input-padrao { 
-    padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; 
-    outline: none; transition: 0.2s; font-size: 14px; width: 100%;
-    box-sizing: border-box;
-}
-.input-padrao:focus { border-color: #ea1d2c; box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.1); }
-
-.form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 8px; }
-.form-group label { font-size: 12px; font-weight: 700; color: #718096; }
-
-/* CORREÇÃO PARA VALOR E VENCIMENTO LADO A LADO */
-.form-row { 
-    display: flex; 
-    gap: 15px; 
-    margin-bottom: 18px;
-    width: 100%;
-}
-.form-row .form-group { flex: 1; margin-bottom: 0; }
-
-.modal-acoes { display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px; }
-
-/* LISTA CATS - AJUSTE SCROLL E BOTÕES */
-.add-cat-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px; }
-.lista-categorias { max-height: 250px; overflow-y: auto; border: 1px solid #edf2f7; border-radius: 10px; }
-.item-cat-lista { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 14px 15px; border-bottom: 1px solid #f7fafc; 
-}
-.btn-trash-cat { background: none; border: none; color: #cbd5e0; cursor: pointer; transition: 0.2s; padding: 5px; }
-.btn-trash-cat:hover { color: #e53e3e; }
-
-/* RESPONSIVIDADE - AJUSTES PARA CELULAR SEM QUEBRAR O DESKTOP */
+/* --- RESPONSIVIDADE (O QUE CORRIGE O CELULAR) --- */
 @media (max-width: 768px) {
-    .header-financeiro { flex-direction: column; align-items: flex-start; }
+    .container-financeiro { padding: 15px; }
+
+    .header-financeiro { flex-direction: column; align-items: flex-start; gap: 15px; }
     
     .dashboard-row { 
-        grid-template-columns: 1fr; /* Empilha os cards acima do gráfico */
+        grid-template-columns: 1fr; 
     }
 
     .grafico-wrapper { 
-        flex-direction: column; /* Coloca a legenda abaixo do gráfico no mobile */
+        flex-direction: column; 
         height: auto;
     }
 
-    .chart-area { 
-        width: 100%; 
-        min-height: 250px; 
-    }
+    .chart-area { width: 100%; min-height: 250px; }
 
     .legenda-custom { 
-        margin-left: 0; 
-        border-left: none; 
-        border-top: 2px solid #f1f5f9; 
-        padding-left: 0; 
-        padding-top: 20px;
-        width: 100%;
+        margin-left: 0; border-left: none; border-top: 2px solid #f1f5f9; 
+        padding-left: 0; padding-top: 20px; width: 100%;
     }
 
+    /* CORREÇÃO DA TABELA ESTICADA */
     .card-tabela {
-        overflow-x: auto; /* Permite scroll horizontal na tabela no celular */
+        overflow-x: auto; /* Habilita scroll lateral */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabela-v {
+        min-width: 700px; /* Garante que a tabela não esmague os textos */
+    }
+
+    .tabela-v td, .tabela-v th {
+        white-space: nowrap; /* Impede que o texto quebre linha e estique a célula */
+        padding: 12px;
     }
 
     .filtros-topo {
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: stretch;
         gap: 15px;
     }
-
-    .filtro-item { flex: 1; min-width: 120px; }
 }
