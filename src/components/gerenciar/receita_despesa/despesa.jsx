@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as api from "../../../api/Despesas";
-import { Chart } from "react-google-charts";
-import { Trash2, Pencil, X, Check } from "lucide-react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+import { Trash2, Pencil, X, Tag, Plus, Search, CheckCircle } from "lucide-react"; 
 import "./styles.css";
 
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 function Despesa() {
-    const [loading, setLoading] = useState(true);
     const [despesas, setDespesas] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [filtroStatus, setFiltroStatus] = useState("TUDO");
     const [busca, setBusca] = useState("");
     
     const [showModalDespesa, setShowModalDespesa] = useState(false);
-    const [showModalCat, setShowModalCat] = useState(false);
+    const [showModalCategoria, setShowModalCategoria] = useState(false);
     const [editandoId, setEditandoId] = useState(null);
 
     const [mesFiltro, setMesFiltro] = useState(new Date().getMonth() + 1);
@@ -21,35 +23,42 @@ function Despesa() {
     const [form, setForm] = useState({ descricao: '', valor: '', id_categoria: '', data_vencimento: '' });
     const [novaCat, setNovaCat] = useState("");
 
-    const carregarDados = async () => {
-        setLoading(true);
+    const carregarDados = useCallback(async () => {
         try {
             const [resCat, resDes] = await Promise.all([api.getCategoriasDespesa(), api.getDespesas()]);
             setCategorias(resCat.data || []);
             setDespesas(resDes.data || []);
-        } catch (e) { console.error("Erro ao carregar:", e); }
-        setLoading(false);
-    };
+        } catch (e) { console.error("Erro ao carregar dados", e); }
+    }, []);
 
-    useEffect(() => { carregarDados(); }, []);
+    useEffect(() => { carregarDados(); }, [carregarDados]);
 
     const handleSalvarDespesa = async () => {
-        if (!form.descricao || !form.valor || !form.id_categoria || !form.data_vencimento) {
-            return alert("Preencha todos os campos obrigatórios!");
-        }
+        if (!form.descricao || !form.valor || !form.id_categoria || !form.data_vencimento) return alert("Preencha tudo!");
         try {
             if (editandoId) {
                 await api.updateDespesa(editandoId, form);
             } else {
-                await api.createDespesa({ 
-                    ...form, 
-                    id_usuario: localStorage.getItem("id_usuario"), 
-                    status: 'A' 
-                });
+                await api.createDespesa({ ...form, id_usuario: localStorage.getItem("id_usuario"), status: 'A' });
             }
             fecharModal();
             carregarDados();
-        } catch (e) { alert("Erro ao salvar despesa"); }
+        } catch (e) { alert("Erro ao salvar"); }
+    };
+
+    const handleSalvarCategoria = async () => {
+        if (!novaCat) return;
+        try {
+            await api.createCategoriaDespesa({ descricao: novaCat });
+            setNovaCat("");
+            carregarDados();
+        } catch (e) { alert("Erro ao salvar categoria"); }
+    };
+
+    const handleExcluirCategoria = async (id) => {
+        if (window.confirm("Excluir categoria?")) {
+            try { await api.deleteCategoriaDespesa(id); carregarDados(); } catch (e) { alert("Erro ao excluir"); }
+        }
     };
 
     const handleEditar = (d) => {
@@ -69,229 +78,226 @@ function Despesa() {
         setForm({ descricao: '', valor: '', id_categoria: '', data_vencimento: '' });
     };
 
-    const handleSalvarCategoria = async () => {
-        if (!novaCat) return;
-        try {
-            await api.createCategoriaDespesa({ descricao: novaCat });
-            setNovaCat("");
-            carregarDados();
-        } catch (e) { alert("Erro ao salvar categoria"); }
-    };
-
     const dadosFiltrados = despesas.filter(d => {
         const dataVenc = d.data_vencimento.split('T')[0].split('-');
-        const ano = parseInt(dataVenc[0]);
-        const mes = parseInt(dataVenc[1]);
-        const matchMesAno = mes === Number(mesFiltro) && ano === Number(anoFiltro);
+        const matchMesAno = parseInt(dataVenc[1]) === Number(mesFiltro) && parseInt(dataVenc[0]) === Number(anoFiltro);
         const matchStatus = filtroStatus === "TUDO" || d.status === filtroStatus;
         const matchBusca = d.descricao.toLowerCase().includes(busca.toLowerCase());
         return matchMesAno && matchStatus && matchBusca;
     });
 
-    const totalAberto = dadosFiltrados.filter(d => d.status === 'A').reduce((acc, curr) => acc + Number(curr.valor), 0);
-    const totalPago = dadosFiltrados.filter(d => d.status === 'P').reduce((acc, curr) => acc + Number(curr.valor), 0);
+    const categoriasMap = new Map();
+    const coresFixas = ['#ea1d2c', '#007BFF', '#28a745', '#ffc107', '#6f42c1', '#17a2b8', '#fd7e14', '#20c997'];
 
-    const cores = ["#3498db", "#2ecc71", "#ea1d2c", "#f1c40f", "#9b59b6", "#e67e22", "#1abc9c"];
+    dadosFiltrados.forEach(d => {
+        const nome = d.categoria_nome || "Sem Categoria";
+        const valor = parseFloat(String(d.valor || 0));
+        categoriasMap.set(nome, (categoriasMap.get(nome) || 0) + valor);
+    });
 
-    const prepararDadosGrafico = () => {
-        const resumo = {};
-        dadosFiltrados.forEach(d => {
-            const cat = d.categoria_nome || "Outros";
-            resumo[cat] = (resumo[cat] || 0) + Number(d.valor);
-        });
-        const labels = Object.entries(resumo);
-        const data = [["Categoria", "Valor"]];
-        labels.forEach(([cat, valor]) => data.push([cat, valor]));
-        return { data, resumo: labels };
+    const labelsPizza = Array.from(categoriasMap.keys());
+    const valoresPizza = Array.from(categoriasMap.values());
+
+    const dataChart = {
+        labels: labelsPizza,
+        datasets: [{
+            data: valoresPizza,
+            backgroundColor: coresFixas.slice(0, labelsPizza.length),
+            hoverOffset: 8,
+            borderWidth: 2,
+            borderColor: "#ffffff"
+        }]
     };
 
-    const { data: dadosGrafico, resumo: resumoCategorias } = prepararDadosGrafico();
+    const chartOptions = {
+        cutout: '75%',
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+        },
+        maintainAspectRatio: false
+    };
+
+    const formatBRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     return (
         <div className="container-financeiro">
-            <div className="header-financeiro">
-                <h1>Gerenciar Despesas</h1>
-                <div className="acoes-topo">
-                    <button className="btn-outline" onClick={() => setShowModalCat(true)}>Categorias</button>
-                    <button className="btn-principal" onClick={() => setShowModalDespesa(true)}>+ Nova Despesa</button>
+            <header className="header-principal">
+                <div className="titulo-sessao">
+                    <h1>Gerenciar Despesas</h1>
+                    <p>Controle seus gastos de forma inteligente</p>
                 </div>
-            </div>
+                <div className="acoes-header">
+                    <button className="btn-secundario" onClick={() => setShowModalCategoria(true)}>
+                        <Tag size={18} /> Categorias
+                    </button>
+                    <button className="btn-ifood" onClick={() => setShowModalDespesa(true)}>
+                        <Plus size={18} /> Nova Despesa
+                    </button>
+                </div>
+            </header>
 
-            <div className="filtros-topo">
-                <div className="filtro-item">
-                    <label>MÊS DE REFERÊNCIA</label>
-                    <select className="input-padrao" value={mesFiltro} onChange={(e) => setMesFiltro(e.target.value)}>
+            <div className="card-filtros-data">
+                <div className="seletor-grupo">
+                    <label>Mês de Referência</label>
+                    <select value={mesFiltro} onChange={(e) => setMesFiltro(e.target.value)}>
                         {["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"].map((m, i) => (
                             <option key={i} value={i+1}>{m}</option>
                         ))}
                     </select>
                 </div>
-                <div className="filtro-item">
-                    <label>ANO</label>
-                    <select className="input-padrao" value={anoFiltro} onChange={(e) => setAnoFiltro(e.target.value)}>
+                <div className="seletor-grupo">
+                    <label>Ano</label>
+                    <select value={anoFiltro} onChange={(e) => setAnoFiltro(e.target.value)}>
                         <option value="2025">2025</option>
                         <option value="2026">2026</option>
                     </select>
                 </div>
             </div>
 
-            <div className="dashboard-row">
-                <div className="cards-col">
-                    <div className="mini-card pendente">
-                        <span>A PAGAR</span>
-                        <h3>R$ {totalAberto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+            <div className="layout-dashboard">
+                <div className="coluna-cards">
+                    <div className="card-info-v2 pendente">
+                        <div className="indicator" />
+                        <div className="info-content">
+                            <span>A PAGAR</span>
+                            <h2>{formatBRL(dadosFiltrados.filter(d=>d.status==='A').reduce((acc,curr)=>acc+Number(curr.valor),0))}</h2>
+                        </div>
                     </div>
-                    <div className="mini-card pago">
-                        <span>TOTAL PAGO</span>
-                        <h3>R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+                    <div className="card-info-v2 pago">
+                        <div className="indicator" />
+                        <div className="info-content">
+                            <span>TOTAL PAGO</span>
+                            <h2>{formatBRL(dadosFiltrados.filter(d=>d.status==='P').reduce((acc,curr)=>acc+Number(curr.valor),0))}</h2>
+                        </div>
                     </div>
                 </div>
 
-                <div className="grafico-col">
-                    <div className="grafico-wrapper">
-                        <div className="chart-area">
-                            <Chart 
-                                chartType="PieChart" 
-                                data={dadosGrafico} 
-                                options={{
-                                    pieHole: 0.5,
-                                    colors: cores,
-                                    chartArea: { width: '90%', height: '90%' },
-                                    legend: 'none',
-                                    pieSliceText: 'percentage'
-                                }} 
-                                width={"100%"} height={"220px"} 
-                            />
-                        </div>
-                        <div className="legenda-custom">
-                            <h4 className="titulo-legenda">Gastos por Categoria ({mesFiltro}/{anoFiltro})</h4>
-                            <div className="legenda-scroll">
-                                {resumoCategorias.length > 0 ? resumoCategorias.map(([cat, valor], i) => (
-                                    <div key={i} className="legenda-item">
-                                        <div className="legenda-cor-txt">
-                                            <div className="ponto-cor" style={{ backgroundColor: cores[i % cores.length] }}></div>
-                                            <span className="txt-cat">{cat}</span>
-                                        </div>
-                                        <span className="val-cat">R$ {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <div className="card-grafico-v2">
+                    <div className="chart-container">
+                        <Doughnut data={dataChart} options={chartOptions} />
+                    </div>
+                    <div className="legenda-container">
+                        <h3>Gastos por Categoria</h3>
+                        <div className="legenda-scroll">
+                            {labelsPizza.length > 0 ? labelsPizza.map((lbl, i) => (
+                                <div key={i} className="legenda-item">
+                                    <div className="legenda-left">
+                                        <span className="dot" style={{ backgroundColor: coresFixas[i % coresFixas.length] }} />
+                                        <span className="label">{lbl}</span>
                                     </div>
-                                )) : <p className="sem-dados">Nenhuma despesa encontrada</p>}
+                                    <span className="valor">{formatBRL(categoriasMap.get(lbl))}</span>
+                                </div>
+                            )) : <p className="sem-dados">Sem dados no período.</p>}
+                        </div>
+                        {valoresPizza.length > 0 && (
+                            <div className="total-pizza-footer">
+                                <span>TOTAL GERAL</span>
+                                <strong>{formatBRL(valoresPizza.reduce((a,b)=>a+b, 0))}</strong>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            <div className="card-tabela">
-                <div className="tabela-header">
-                    <div className="btn-group">
-                        <button className={filtroStatus === 'TUDO' ? 'active' : ''} onClick={() => setFiltroStatus("TUDO")}>Todos</button>
-                        <button className={filtroStatus === 'A' ? 'active' : ''} onClick={() => setFiltroStatus("A")}>Pendentes</button>
-                        <button className={filtroStatus === 'P' ? 'active' : ''} onClick={() => setFiltroStatus("P")}>Pagos</button>
+            <div className="sessao-tabela">
+                <div className="tabela-header-filtros">
+                    {/* BOTÕES ESTILO PÍLULA IFOOD */}
+                    <div className="tabs-status">
+                        <button className={filtroStatus === 'TUDO' ? 'active' : ''} onClick={() => setFiltroStatus('TUDO')}>Todos</button>
+                        <button className={filtroStatus === 'A' ? 'active' : ''} onClick={() => setFiltroStatus('A')}>Pendentes</button>
+                        <button className={filtroStatus === 'P' ? 'active' : ''} onClick={() => setFiltroStatus('P')}>Pagos</button>
                     </div>
-                    <input type="text" className="input-padrao" placeholder="Buscar descrição..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+
+                    {/* BUSCA COM ÍCONE INTERNO */}
+                    <div className="busca-box">
+                        <Search size={18} color="#94a3b8" />
+                        <input 
+                            placeholder="Buscar despesa..." 
+                            value={busca} 
+                            onChange={e => setBusca(e.target.value)} 
+                        />
+                    </div>
                 </div>
 
-                <table className="tabela-v">
-                    <thead>
-                        <tr>
-                            <th>Vencimento</th>
-                            <th>Descrição</th>
-                            <th>Categoria</th>
-                            <th>Valor</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dadosFiltrados.map(d => (
-                            <tr key={d.id_despesa}>
-                                <td>{new Date(d.data_vencimento).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
-                                <td><strong>{d.descricao}</strong></td>
-                                <td>{d.categoria_nome}</td>
-                                <td className="txt-valor-negativo">R$ {Number(d.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                <td>
-                                    <span 
-                                        className={`badge-status ${d.status}`}
-                                        onClick={() => { if(d.status === 'A' && window.confirm("Confirmar pagamento?")) api.pagarDespesa(d.id_despesa).then(carregarDados) }}
-                                        style={{cursor: d.status === 'A' ? 'pointer' : 'default'}}
-                                    >
-                                        {d.status === 'P' ? 'PAGO' : 'PENDENTE'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="tabela-acoes-icones">
-                                        <button className="btn-icon editar" title="Editar" onClick={() => handleEditar(d)}>
-                                            <Pencil size={16} />
-                                        </button>
-                                        <button className="btn-icon excluir" title="Excluir" onClick={() => { if(window.confirm("Excluir despesa?")) api.deleteDespesa(d.id_despesa).then(carregarDados) }}>
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
+                <div className="wrapper-tabela">
+                    <table className="tabela-moderna">
+                        <thead>
+                            <tr>
+                                <th>Vencimento</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th style={{ textAlign: 'right' }}>Ações</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {dadosFiltrados.map(d => (
+                                <tr key={d.id_despesa}>
+                                    <td>{new Date(d.data_vencimento).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
+                                    <td><strong>{d.descricao}</strong></td>
+                                    <td><span className="cat-tag">{d.categoria_nome}</span></td>
+                                    <td>{formatBRL(Number(d.valor))}</td>
+                                    <td><span className={`badge-ifood ${d.status}`}>{d.status === 'P' ? 'PAGO' : 'PENDENTE'}</span></td>
+                                    <td className="acoes-flex">
+                                        <button className="btn-icon edit" title="Editar" onClick={() => handleEditar(d)}><Pencil size={18}/></button>
+                                        {d.status === 'A' && (
+                                            <button className="btn-icon ok" title="Marcar como Pago" onClick={() => api.pagarDespesa(d.id_despesa).then(carregarDados)}><CheckCircle size={18}/></button>
+                                        )}
+                                        <button className="btn-icon del" title="Excluir" onClick={() => window.confirm("Excluir?") && api.deleteDespesa(d.id_despesa).then(carregarDados)}><Trash2 size={18}/></button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            {/* MODAL NOVA/EDITAR DESPESA */}
-            {showModalDespesa && (
+            {/* MODAIS MANTIDOS IGUAIS */}
+            {showModalCategoria && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>{editandoId ? "Editar Despesa" : "Nova Despesa"}</h2>
-                        <div className="form-group">
-                            <label>Descrição</label>
-                            <input type="text" className="input-padrao" value={form.descricao} onChange={e => setForm({...form, descricao: e.target.value})} />
-                        </div>
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Valor</label>
-                                <input type="number" className="input-padrao" value={form.valor} onChange={e => setForm({...form, valor: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                                <label>Vencimento</label>
-                                <input type="date" className="input-padrao" value={form.data_vencimento} onChange={e => setForm({...form, data_vencimento: e.target.value})} />
-                            </div>
+                        <div className="modal-header">
+                            <h2>Gestão de Categorias</h2>
+                            <button className="btn-close" onClick={() => setShowModalCategoria(false)}><X size={20}/></button>
                         </div>
                         <div className="form-group">
-                            <label>Categoria</label>
-                            <select className="input-padrao" value={form.id_categoria} onChange={e => setForm({...form, id_categoria: e.target.value})}>
-                                <option value="">Selecione...</option>
-                                {categorias.map(c => <option key={c.id_categoria} value={c.id_categoria}>{c.descricao}</option>)}
-                            </select>
+                            <div style={{display:'flex', gap:'10px'}}>
+                                <input value={novaCat} onChange={e => setNovaCat(e.target.value)} placeholder="Nova categoria..." style={{flex:1}} />
+                                <button className="btn-ifood" onClick={handleSalvarCategoria}><Plus size={16}/></button>
+                            </div>
                         </div>
-                        <div className="modal-acoes">
-                            <button className="btn-outline" onClick={fecharModal}>Cancelar</button>
-                            <button className="btn-principal" onClick={handleSalvarDespesa}>
-                                <Check size={18} style={{marginRight: '5px'}} /> Salvar
-                            </button>
+                        <div style={{maxHeight: '200px', overflowY: 'auto'}}>
+                            {categorias.map(c => (
+                                <div key={c.id_categoria} style={{display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #eee'}}>
+                                    <span>{c.descricao}</span>
+                                    <button onClick={() => handleExcluirCategoria(c.id_categoria)} style={{background:'none', border:'none', color:'red', cursor:'pointer'}}><Trash2 size={16}/></button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* MODAL CATEGORIAS */}
-            {showModalCat && (
+            {showModalDespesa && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <div className="modal-header-flex">
-                             <h2>Categorias</h2>
-                             <button className="btn-fechar-modal" onClick={() => setShowModalCat(false)}><X size={20}/></button>
+                        <div className="modal-header">
+                            <h2>{editandoId ? "Editar Despesa" : "Nova Despesa"}</h2>
+                            <button className="btn-close" onClick={fecharModal}><X size={20}/></button>
                         </div>
-                        <div className="add-cat-row">
-                            <input type="text" className="input-padrao" placeholder="Nova categoria..." value={novaCat} onChange={e => setNovaCat(e.target.value)} />
-                            <button className="btn-principal" onClick={handleSalvarCategoria}>Add</button>
+                        <div className="form-group"><label>Descrição</label><input value={form.descricao} onChange={e => setForm({...form, descricao: e.target.value})} /></div>
+                        <div className="form-group"><label>Valor</label><input type="number" value={form.valor} onChange={e => setForm({...form, valor: e.target.value})} /></div>
+                        <div className="form-group">
+                            <label>Categoria</label>
+                            <select value={form.id_categoria} onChange={e => setForm({...form, id_categoria: e.target.value})}>
+                                <option value="">Selecione...</option>
+                                {categorias.map(c => <option key={c.id_categoria} value={c.id_categoria}>{c.descricao}</option>)}
+                            </select>
                         </div>
-                        <div className="lista-categorias">
-                            {categorias.map(c => (
-                                <div key={c.id_categoria} className="item-cat-lista">
-                                    <span>{c.descricao}</span>
-                                    <button className="btn-trash-cat" onClick={() => { if(window.confirm("Excluir categoria?")) api.deleteCategoriaDespesa(c.id_categoria).then(carregarDados) }}>
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                        <div className="form-group"><label>Vencimento</label><input type="date" value={form.data_vencimento} onChange={e => setForm({...form, data_vencimento: e.target.value})} /></div>
+                        <button className="btn-ifood w-100" style={{marginTop: '20px'}} onClick={handleSalvarDespesa}>Salvar</button>
                     </div>
                 </div>
             )}
