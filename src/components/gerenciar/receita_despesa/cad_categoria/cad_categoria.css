@@ -1,0 +1,143 @@
+.modal-overlay-cat {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content-cat {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    animation: modalShow 0.3s ease-out;
+}
+
+@keyframes modalShow {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header-cat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header-cat h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #3e3e3e;
+}
+
+.btn-close-cat {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #717171;
+    transition: color 0.2s;
+}
+
+.btn-close-cat:hover {
+    color: #ea1d2c;
+}
+
+.form-input-cat {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.form-input-cat input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-input-cat input:focus {
+    border-color: #ea1d2c;
+}
+
+.btn-add-cat {
+    background: #ea1d2c;
+    color: white;
+    border: none;
+    width: 45px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.btn-add-cat:hover {
+    background: #bf1624;
+}
+
+.lista-categorias-cat {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Scrollbar personalizada */
+.lista-categorias-cat::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lista-categorias-cat::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.item-categoria-cat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.item-categoria-cat span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #3e3e3e;
+}
+
+.btn-del-cat {
+    background: #fef2f2;
+    color: #ea1d2c;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-del-cat:hover {
+    background: #ea1d2c;
+    color: white;
+}
+
+.sem-categorias {
+    text-align: center;
+    color: #717171;
+    font-size: 13px;
+    margin-top: 20px;
+}

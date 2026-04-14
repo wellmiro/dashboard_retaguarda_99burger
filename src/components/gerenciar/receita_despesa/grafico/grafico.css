@@ -1,0 +1,152 @@
+/* Container que segura os dois blocos principais */
+.main-dashboard-wrapper {
+    display: flex;
+    flex-direction: row; /* Desktop: Lado a lado */
+    gap: 20px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.card-custom {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Larguras no Desktop */
+.card-main-stats { width: 65%; min-height: 480px; }
+.card-pending-list { width: 35%; min-height: 480px; }
+
+/* Grid Interno do primeiro card */
+.stats-grid-internal {
+    display: flex;
+    gap: 25px;
+    flex: 1;
+}
+
+.col-visual { width: 45%; display: flex; flex-direction: column; gap: 15px; }
+.col-list { width: 55%; display: flex; flex-direction: column; }
+
+.chart-wrapper-fixed {
+    height: 180px;
+    position: relative;
+    width: 100%;
+}
+
+.ia-summary-box {
+    background: #fdf2f2;
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid #ea1d2c;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+/* Listas com Scroll */
+.scrollable-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 280px;
+    padding-right: 5px;
+}
+
+.list-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f2f6;
+}
+
+.item-info { display: flex; align-items: center; gap: 10px; }
+.color-dot { width: 10px; height: 10px; border-radius: 50%; }
+.item-label { font-size: 0.85rem; color: #444; font-weight: 500; }
+.item-value { font-size: 0.85rem; font-weight: 700; }
+
+/* Rodapé */
+.card-footer-total {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px dashed #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-value { font-size: 1.3rem; color: #ea1d2c; font-weight: 800; }
+
+/* Ajustes para Contas a Pagar */
+.pending-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.pending-badge { background: #fee2e2; color: #ea1d2c; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
+.pending-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f8f9fa; }
+.pending-info strong { font-size: 0.9rem; display: block; }
+.pending-info small { color: #888; font-size: 0.75rem; }
+.pending-price { color: #dc2626; font-weight: 700; }
+
+/* --- RESPONSIVIDADE (AQUI ESTÁ A SOLUÇÃO) --- */
+@media (max-width: 1024px) {
+    /* FORÇA O CONTAINER PAI A VIRAR COLUNA */
+    .main-dashboard-wrapper {
+        flex-direction: column !important; 
+        gap: 15px;
+    }
+
+    /* Cards ocupam a largura toda e perdem a largura fixa do desktop */
+    .card-main-stats, .card-pending-list {
+        width: 100% !important;
+        min-height: auto;
+    }
+    
+    /* Faz o conteúdo dentro do card do gráfico também empilhar */
+    .stats-grid-internal {
+        flex-direction: column !important;
+    }
+    
+    .col-visual, .col-list {
+        width: 100% !important;
+    }
+
+    .chart-wrapper-fixed {
+        height: 220px;
+        margin-bottom: 10px;
+    }
+}
+
+/* CENTRALIZAR O BLOCO DO GRÁFICO */
+.col-visual {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center; /* 🔥 CENTRALIZA */
+}
+
+/* CENTRALIZAR O CANVAS DO GRÁFICO */
+.chart-wrapper-fixed {
+    height: 180px;
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* 🔥 CENTRALIZA HORIZONTAL */
+    align-items: center;     /* 🔥 CENTRALIZA VERTICAL */
+}
+
+/* GARANTE QUE O CANVAS NÃO ESTOURE */
+.chart-wrapper-fixed canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+/* 🔥 AJUSTE DE MARGEM DO PAINEL */
+.relatorios-container {
+    padding: 10px 15px; /* diminui as laterais */
+}
+
+/* MOBILE AINDA MAIS JUSTO */
+@media (max-width: 1024px) {
+    .relatorios-container {
+        padding: 5px 10px;
+    }
+}

@@ -1,0 +1,114 @@
+.container-cads {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 300px; /* Mantém o padrão desktop */
+    margin-top: 20px;
+}
+
+.cad-item {
+    background: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    height: 85px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.barra-lateral {
+    width: 6px;
+    height: 100%;
+}
+
+.pendente .barra-lateral { background-color: #ea1d2c; }    /* Vermelho */
+.pago .barra-lateral { background-color: #28a745; }        /* Verde */
+.movimentacao .barra-lateral { background-color: #007bff; } /* Azul */
+
+.conteudo-cad {
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.titulo-cad {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.valor-cad {
+    font-size: 22px;
+    color: #1e293b;
+    margin: 4px 0 0 0;
+    font-weight: 800;
+}
+
+/* AJUSTE PARA MOBILE (Celular) */
+@media (max-width: 768px) {
+    .container-cads {
+        width: 100%; /* Ocupa a largura total no mobile */
+        max-width: 100%;
+        margin-top: 10px;
+        padding: 0 15px; /* Margem interna para não colar na borda do celular */
+        box-sizing: border-box;
+    }
+
+    .cad-item {
+        width: 100%; /* Cards esticam no mobile */
+    }
+}
+
+/* CONTAINER PAI (Wrapper) */
+.layout-dashboard-horizontal {
+    display: flex;
+    flex-direction: row; /* Lado a lado no Desktop */
+    gap: 20px;
+    width: 100%;
+    align-items: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* O SEU CONTAINER DE CARDS (Esquerda) */
+.container-cads {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 300px; /* Largura fixa no Desktop */
+    flex-shrink: 0; /* Impede que ele diminua */
+}
+
+/* O COMPONENTE DE GRÁFICO (Direita) */
+.dashboard-content-right {
+    flex: 1; /* Ocupa o restante do espaço */
+    min-width: 0; /* Evita quebra de layout com flex */
+}
+
+/* --- AJUSTE MOBILE --- */
+@media (max-width: 1024px) {
+    .layout-dashboard-horizontal {
+        flex-direction: column !important; /* EMPILHA NO CELULAR */
+        padding: 10px;
+    }
+
+    .container-cads {
+        width: 100% !important; /* Cards ocupam largura total */
+        margin-top: 10px;
+    }
+
+    .dashboard-content-right {
+        width: 100% !important;
+    }
+}
+
+/* Seus estilos de Cad-Item permanecem iguais */
+.cad-item {
+    background: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    height: 85px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}

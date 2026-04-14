@@ -1,0 +1,146 @@
+.area-header-despesa {
+    margin-bottom: 25px;
+}
+
+/* ================= DESKTOP ================= */
+.header-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.titulo-sessao h1 {
+    font-size: 28px;
+    color: #3e4656;
+    margin: 0;
+    font-weight: 700;
+}
+
+.titulo-sessao p {
+    color: #94a3b8;
+    margin: 2px 0 0 0;
+}
+
+.acoes-header {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secundario, 
+.btn-ifood {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.btn-secundario {
+    background: #fff;
+    color: #333;
+}
+
+.btn-ifood {
+    background: #ea1d2c;
+    color: #fff;
+    border: none;
+}
+
+.btn-ifood:hover {
+    background: #d91a27;
+}
+
+/* Card de filtros */
+.card-filtros-data {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    gap: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    align-items: center;
+}
+
+.seletor-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.seletor-grupo label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.seletor-grupo select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    min-width: 150px;
+    color: #334155;
+    font-weight: 500;
+    outline: none;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 1024px) {
+
+    .area-header-despesa {
+        margin-bottom: 15px;
+    }
+
+    /* Header empilhado */
+    .header-principal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .titulo-sessao h1 {
+        font-size: 22px;
+    }
+
+    .titulo-sessao p {
+        font-size: 13px;
+    }
+
+    /* Botões ocupam largura total */
+    .acoes-header {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-secundario,
+    .btn-ifood {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* Filtros empilhados */
+    .card-filtros-data {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        width: 100%;
+    }
+
+    .seletor-grupo {
+        width: 100%;
+    }
+
+    .seletor-grupo select {
+        width: 100%;
+        min-width: unset;
+    }
+}

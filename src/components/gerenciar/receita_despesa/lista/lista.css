@@ -1,0 +1,183 @@
+.sessao-tabela {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tabela-header-filtros {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.tabs-status {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 100px;
+}
+
+.tabs-status button {
+    border: none;
+    background: transparent;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #717171;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tabs-status button.active {
+    background: white;
+    color: #3e3e3e;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.busca-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 300px;
+}
+
+.busca-box svg {
+    position: absolute;
+    left: 12px;
+}
+
+.busca-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    outline: none;
+    font-size: 14px;
+}
+
+.busca-box input:focus {
+    background: white;
+    border-color: #ea1d2c;
+}
+
+/* CONTAINER PARA ROLAGEM LATERAL */
+.wrapper-tabela { 
+    width: 100%; 
+    overflow-x: auto; /* Permite rolar se as colunas crescerem demais */
+    border-radius: 8px;
+}
+
+/* TABELA QUE CRESCE CONFORME O TEXTO */
+.tabela-moderna { 
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: auto; /* Força as colunas a seguirem o tamanho do texto */
+    min-width: 100%;
+}
+
+.tabela-moderna th {
+    text-align: left;
+    padding: 12px;
+    color: #717171;
+    font-size: 11px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #f4f7f9;
+    white-space: nowrap; /* Título sempre em uma linha */
+}
+
+.tabela-moderna td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f4f7f9;
+    font-size: 13px;
+    color: #3e3e3e;
+    white-space: nowrap; /* GARANTE QUE A COLUNA ESTIQUE EM VEZ DE QUEBRAR O TEXTO */
+}
+
+/* Colunas com larguras fixas mínimas para organização */
+.col-status {
+    width: 120px;
+    text-align: center !important;
+}
+
+.col-acoes {
+    width: 130px;
+    text-align: right !important;
+}
+
+.badge-ifood {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 75px;
+    text-align: center;
+}
+
+.badge-ifood.A { background: #fee2e2; color: #ea1d2c; }
+.badge-ifood.P { background: #d1fae5; color: #00891a; }
+
+.cat-tag {
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.acoes-flex { 
+    display: flex; 
+    gap: 8px; 
+    justify-content: flex-end; 
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-icon.edit { background: #eff6ff; color: #2563eb; }
+.btn-icon.ok { background: #ecfdf5; color: #00891a; }
+.btn-icon.del { background: #fef2f2; color: #ea1d2c; }
+
+.btn-icon:hover { transform: scale(1.1); }
+
+.vazio-msg {
+    padding: 40px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+    .tabela-header-filtros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .busca-box {
+        max-width: 100%;
+    }
+
+    /* A tabela continuará esticada lateralmente, permitindo o scroll */
+    .tabela-moderna {
+        display: table; /* Garante que mantenha o comportamento de tabela */
+    }
+}
