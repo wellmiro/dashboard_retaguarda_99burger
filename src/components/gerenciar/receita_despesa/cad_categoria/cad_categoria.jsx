@@ -62,6 +62,7 @@ function CadCategoria({ isOpen, onClose, onRefresh }) {
                         value={novaCat}
                         onChange={(e) => setNovaCat(e.target.value)}
                         placeholder="Nova categoria..."
+                        onKeyDown={(e) => e.key === 'Enter' && handleSalvar()}
                     />
                     <button className="btn-add-cat" onClick={handleSalvar}>
                         <Plus size={20} />
@@ -69,17 +70,22 @@ function CadCategoria({ isOpen, onClose, onRefresh }) {
                 </div>
 
                 <div className="lista-categorias-cat">
-                    {categorias.map((c) => (
-                        <div key={c.id_categoria} className="item-categoria-cat">
-                            <span>{c.descricao}</span>
-                            <button 
-                                className="btn-del-cat" 
-                                onClick={() => handleExcluir(c.id_categoria)}
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    ))}
+                    {categorias.length > 0 ? (
+                        categorias.map((c) => (
+                            <div key={c.id_categoria} className="item-categoria-cat">
+                                <span>{c.descricao}</span>
+                                <button 
+                                    className="btn-del-cat" 
+                                    onClick={() => handleExcluir(c.id_categoria)}
+                                    title="Excluir categoria"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="sem-categorias">Nenhuma categoria encontrada.</p>
+                    )}
                 </div>
             </div>
         </div>

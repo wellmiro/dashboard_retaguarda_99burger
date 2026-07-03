@@ -1,6 +1,6 @@
 import React from "react";
 import { Tag, Plus } from "lucide-react";
-import "./header.css";
+import "./header.css"
 
 function Header({ mesFiltro, setMesFiltro, anoFiltro, setAnoFiltro, abrirModalCategoria, abrirModalDespesa }) {
     const meses = [

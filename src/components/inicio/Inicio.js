@@ -4,19 +4,20 @@ import Cards from "./cards/Cards";
 import Grafico from "./grafico/Grafico";
 import PedidosRecentes from "./pedidos/PedidosRecentes";
 import RankingProdutos from "./rankingprodutos/RankingProdutos";
-import { getUsuario } from "../../api/Usuarios";
+import { getEstabelecimentoDashboard } from "../../api/Api"; // Importa a nova rota
 import { getPedidos } from "../../api/Pedidos";
 import "./Styles.css";
 
 function Inicio() {
   const [filtro, setFiltro] = useState("hoje");
-  const [horaAbertura, setHoraAbertura] = useState("08:00");
-  const [horaFechamento, setHoraFechamento] = useState("03:50");
+  // 🟢 Começam com valor padrão e mudam dinamicamente conforme o banco
+  const [horaAbertura, setHoraAbertura] = useState("00:00");
+  const [horaFechamento, setHoraFechamento] = useState("23:59");
   const [dataEspecifica, setDataEspecifica] = useState(
     new Date().toISOString().split("T")[0]
   );
 
-  const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState(null); // Vai armazenar os dados da empresa pro Header
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,12 +34,26 @@ function Inicio() {
       try {
         setLoading(true);
 
-        const [resUsuario, resPedidos] = await Promise.all([
-          getUsuario(idUsuario),
+        // Faz as duas requisições de forma segura e paralela
+        const [resEmpresa, resPedidos] = await Promise.all([
+          getEstabelecimentoDashboard(),
           getPedidos(),
         ]);
 
-        setUsuario(resUsuario);
+        // Define os dados da empresa (nome, rua, logo) para o Header ler
+        if (resEmpresa && resEmpresa.data) {
+          setUsuario(resEmpresa.data);
+
+          // 🟢 Captura os horários reais do estabelecimento vindos do banco de dados
+          if (resEmpresa.data.horario_abertura) {
+            const aberturaFormatada = resEmpresa.data.horario_abertura.substring(0, 5); // ex: "18:00"
+            setHoraAbertura(aberturaFormatada);
+          }
+          if (resEmpresa.data.horario_fechamento) {
+            const fechamentoFormatada = resEmpresa.data.horario_fechamento.substring(0, 5); // ex: "02:00"
+            setHoraFechamento(fechamentoFormatada);
+          }
+        }
 
         const lista = Array.isArray(resPedidos.data)
           ? resPedidos.data
