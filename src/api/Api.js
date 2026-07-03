@@ -62,5 +62,6 @@ export const getUsuario = (id) => api.get(`/usuarios/${id}`);
 
 // --- DASHBOARD ---
 export const getDashboard = () => api.get("/dashboard");
+export const getEstabelecimentoDashboard = () => api.get("/dashboard/estabelecimento"); // 🟢 ADICIONADO COM SUCESSO
 
 export default api;
