@@ -124,6 +124,11 @@
   color: #fff;
 }
 
+.card.bg-info {
+  background: linear-gradient(135deg, #22c1c3, #0e7c86);
+  color: #fff;
+}
+
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .filtros {
@@ -187,6 +192,11 @@
 
 .cards-row .card.bg-primary {
   background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: #fff !important;
+}
+
+.cards-row .card.bg-info {
+  background: linear-gradient(135deg, #22c1c3, #0e7c86) !important;
   color: #fff !important;
 }
 

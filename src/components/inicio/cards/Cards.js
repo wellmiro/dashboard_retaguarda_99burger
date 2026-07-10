@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getPedidos } from "../../../api/Pedidos";
 
 import "./Styles.css";
@@ -8,6 +8,7 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
   const [faturamentoDoDia, setFaturamentoDoDia] = useState(0);
   const [taxaEntrega, setTaxaEntrega] = useState(0);
   const [produtosVendidos, setProdutosVendidos] = useState(0);
+  const [boletoAReceber, setBoletoAReceber] = useState(0);
 
   const [dataEspecifica, setDataEspecifica] = useState(new Date().toISOString().split('T')[0]);
 
@@ -20,7 +21,7 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
     return new Date(`${ano}-${mes}-${dia}T${horario}`);
   };
 
-  const getIntervalo = () => {
+  const getIntervalo = useCallback(() => {
     let inicio = new Date();
     let fim = new Date();
 
@@ -43,7 +44,7 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
     }
 
     return { inicio, fim };
-  };
+  }, [filtro, dataEspecifica, horaAbertura, horaFechamento]);
 
   useEffect(() => {
     getPedidos()
@@ -62,19 +63,21 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
 
         setPedidosDoDia(pedidosPeriodo.length);
 
-        const totalFaturamento = pedidosPeriodo.reduce(
+        const pedidosFinalizados = pedidosPeriodo.filter((p) => p.status === "F");
+
+        const totalFaturamento = pedidosFinalizados.reduce(
           (acc, p) => acc + parseFloat(p.vl_total || p.valor_total || 0),
           0
         );
         setFaturamentoDoDia(totalFaturamento);
 
-        const totalEntrega = pedidosPeriodo.reduce(
+        const totalEntrega = pedidosFinalizados.reduce(
           (acc, p) => acc + parseFloat(p.vl_entrega || p.valor_entrega || 0),
           0
         );
         setTaxaEntrega(totalEntrega);
 
-        const totalProdutos = pedidosPeriodo.reduce((acc, p) => {
+        const totalProdutos = pedidosFinalizados.reduce((acc, p) => {
           const itens = Array.isArray(p.itens) ? p.itens : p.itens || p.pedido_itens || [];
           return (
             acc +
@@ -85,9 +88,14 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
           );
         }, 0);
         setProdutosVendidos(totalProdutos);
+
+        const totalBoleto = pedidosFinalizados
+          .filter((p) => String(p.forma_pagamento || "").toLowerCase() === "boleto")
+          .reduce((acc, p) => acc + parseFloat(p.vl_total || p.valor_total || 0), 0);
+        setBoletoAReceber(totalBoleto);
       })
       .catch((err) => console.error("Erro ao buscar pedidos:", err));
-  }, [filtro, horaAbertura, horaFechamento, dataEspecifica]);
+  }, [getIntervalo]); // Dependência atualizada
 
   const handleDateChange = (e) => {
     const novaData = e.target.value;
@@ -137,7 +145,6 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
           />
         </label>
 
-        {/* AJUSTE AQUI: Removi o estilo manual para ele usar o CSS da classe .filtros */}
         <label className="filtro-data-direita">
           Filtrar dia:
           <input
@@ -189,6 +196,18 @@ function Cards({ filtro, setFiltro, horaAbertura, setHoraAbertura, horaFechament
             <div className="card-info">
               <span className="card-value">{produtosVendidos}</span>
               <span className="card-label">Produtos vendidos</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-info">
+          <div className="card-left">
+            <div className="card-icon">🧾</div>
+            <div className="card-info">
+              <span className="card-value">
+                R$ {(boletoAReceber || 0).toFixed(2)}
+              </span>
+              <span className="card-label">Boleto - A Receber</span>
             </div>
           </div>
         </div>
