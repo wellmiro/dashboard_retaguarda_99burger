@@ -1,0 +1,106 @@
+.ficha-tecnica-container {
+  padding: 16px 4px;
+}
+
+.ficha-tecnica-container .titulo {
+  margin-bottom: 4px;
+}
+
+.ficha-tecnica-container .sub-title {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.adicionar-insumo-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.select-insumo {
+  flex: 2;
+  min-width: 180px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.input-qtd-consumida {
+  flex: 1;
+  min-width: 100px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.unidade-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 30px;
+}
+
+.btn-adicionar-item {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-adicionar-item:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.itens-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.item-nome {
+  font-weight: 500;
+  color: #111827;
+}
+
+.item-detalhes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-valor {
+  color: #3b82f6;
+  font-size: 13px;
+}
+
+.btn-delete-inline {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.mensagem-vazia {
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 0;
+}
