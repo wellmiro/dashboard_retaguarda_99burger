@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { getProdutos, updateProduto, deleteProduto } from "../../../api/Produtos";
 import { getCategorias } from "../../../api/Categorias"; 
 import Grupos from "../grupos/Grupos";
-import FichaTecnica from '../Fichatecnica/FichaTecnica';
+import FichaTecnica from '../FichaTecnica/FichaTecnica';
 import { formatQtd, stepPorUnidade, isFracionado, UNIDADES_MEDIDA } from "../../../utils/formatQtd";
 import "./Styles.css";
 
