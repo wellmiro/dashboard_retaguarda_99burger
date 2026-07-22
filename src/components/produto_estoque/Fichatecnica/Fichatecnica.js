@@ -332,3 +332,5 @@ export default function FichaTecnica({
 function insunosDisponiveisMap(arr) {
   return Array.isArray(arr) ? arr : [];
 }
+
+// nova versao
