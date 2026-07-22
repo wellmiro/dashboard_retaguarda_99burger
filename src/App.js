@@ -9,6 +9,8 @@ import Estoque from "./components/relatorios/estoque/Estoque";
 import Financeiro from "./components/relatorios/financeiro/Financeiro";
 import ProdutoEstoque from "./components/produto_estoque/ProdutoEstoque";
 import Login from "./components/login/Login";
+import CadProdutos from "./components/produto_estoque/produtos/CadProdutos";
+import Insumos from "./components/produto_estoque/insumos/Insumos";
 
 // AQUI ESTÁ A MUDANÇA:
 // Importamos o arquivo .jsx (que é a tela/página)
@@ -47,6 +49,8 @@ function App() {
                     {/* AQUI: Usamos o componente da página .jsx */}
                     <Route path="/receita-despesa" element={<PaginaDespesa />} /> 
                     
+                    <Route path="/produtos" element={<CadProdutos />} />
+                    <Route path="/insumos" element={<Insumos />} />
                     <Route path="/vendas" element={<Vendas />} />
                     <Route path="/estoque" element={<Estoque />} />
                     <Route path="/produto-estoque" element={<ProdutoEstoque />} />

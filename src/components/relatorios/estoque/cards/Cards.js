@@ -1,6 +1,7 @@
 // src/components/estoque/cards/Cards.js
 import React from "react";
 import "./Styles.css";
+import { formatQtdTotal } from "../../../../utils/formatQtd";
 
 function Cards({ produtos }) {
   // Agora produtos vem por props já filtrado
@@ -31,9 +32,9 @@ function Cards({ produtos }) {
 
       <div
         className="card card-pedidos"
-        data-tooltip="Soma da quantidade de todos os produtos disponíveis."
+        data-tooltip="Soma da quantidade de todos os produtos disponíveis (pode misturar unidades diferentes, ex: UN + KG)."
       >
-        <h3>{qtdTotal}</h3>
+        <h3>{formatQtdTotal(qtdTotal)}</h3>
         <p>Qtd. Total</p>
       </div>
 

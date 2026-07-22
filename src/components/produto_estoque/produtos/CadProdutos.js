@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './Styles.css';
 // IMPORTANTE: Importando tudo da nossa API centralizada
 import { createProduto, getCategorias } from '../../../api/Api';
+import { UNIDADES_MEDIDA, stepPorUnidade, isFracionado } from '../../../utils/formatQtd';
 
 const INITIAL_FORM_DATA = {
     nome: '',
@@ -9,6 +10,7 @@ const INITIAL_FORM_DATA = {
     categoria: '', 
     urlFoto: '',
     descricao: '',
+    unidadeMedida: 'UN',
     qtdMax: '',
     qtdMin: '',
 };
@@ -21,6 +23,25 @@ const CadProdutos = ({ onUpdate }) => {
     const handleInputChange = useCallback((e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    }, []);
+
+    // Ao trocar a unidade, garante que qtdMax/qtdMin já existentes sigam a regra certa
+    // (UN = inteiro, KG/G/L/ML = até 3 casas decimais)
+    const handleUnidadeChange = useCallback((e) => {
+        const novaUnidade = e.target.value;
+        setFormData(prev => {
+            const ajustar = (valor) => {
+                if (valor === '') return '';
+                const num = Number(valor) || 0;
+                return isFracionado(novaUnidade) ? num : Math.round(num);
+            };
+            return {
+                ...prev,
+                unidadeMedida: novaUnidade,
+                qtdMax: ajustar(prev.qtdMax),
+                qtdMin: ajustar(prev.qtdMin),
+            };
+        });
     }, []);
 
     const fetchCategorias = useCallback(async () => {
@@ -56,12 +77,21 @@ const CadProdutos = ({ onUpdate }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { nome, preco, categoria, urlFoto, descricao, qtdMax, qtdMin } = formData;
+        const { nome, preco, categoria, urlFoto, descricao, unidadeMedida, qtdMax, qtdMin } = formData;
 
         if (!nome || !preco || !categoria) {
             alert("⚠️ Preencha os campos obrigatórios: Nome, Preço e Categoria");
             return;
         }
+
+        const fracionado = isFracionado(unidadeMedida);
+        // UN só aceita inteiro; unidades fracionadas guardam até 3 casas decimais
+        const parseQtd = (valor, fallback) => {
+            if (valor === '' || valor == null) return fallback;
+            const num = Number(valor);
+            if (isNaN(num) || num < 0) return fallback;
+            return fracionado ? Number(num.toFixed(3)) : Math.round(num);
+        };
 
         try {
             const produtoData = {
@@ -70,8 +100,9 @@ const CadProdutos = ({ onUpdate }) => {
                 preco: parseFloat(preco), 
                 url_foto: urlFoto,
                 qtd: 0,
-                qtd_max: qtdMax ? parseInt(qtdMax) : 0, 
-                qtd_min: qtdMin ? parseInt(qtdMin) : 0, 
+                qtd_max: parseQtd(qtdMax, 0), 
+                qtd_min: parseQtd(qtdMin, 0), 
+                unidade_medida: unidadeMedida,
                 id_categoria: parseInt(categoria)
             };
 
@@ -85,7 +116,7 @@ const CadProdutos = ({ onUpdate }) => {
         }
     };
 
-    const { nome, preco, categoria, urlFoto, descricao, qtdMax, qtdMin } = formData; 
+    const { nome, preco, categoria, urlFoto, descricao, unidadeMedida, qtdMax, qtdMin } = formData; 
 
     return (
         <div id="produtoWrapper">
@@ -153,9 +184,28 @@ const CadProdutos = ({ onUpdate }) => {
 
                 <div className="form-row">
                     <div className="form-group">
+                        <label className="form-label">Unidade de Medida</label>
+                        <select
+                            className="form-select"
+                            name="unidadeMedida"
+                            value={unidadeMedida}
+                            onChange={handleUnidadeChange}
+                        >
+                            {UNIDADES_MEDIDA.map(u => (
+                                <option key={u} value={u}>{u}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div />
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
                         <label className="form-label">Estoque Máx</label>
                         <input
                             type="number"
+                            step={stepPorUnidade(unidadeMedida)}
+                            min="0"
                             className="form-control"
                             name="qtdMax" 
                             value={qtdMax}
@@ -166,6 +216,8 @@ const CadProdutos = ({ onUpdate }) => {
                         <label className="form-label">Estoque Min (Alerta)</label>
                         <input
                             type="number"
+                            step={stepPorUnidade(unidadeMedida)}
+                            min="0"
                             className="form-control"
                             name="qtdMin" 
                             value={qtdMin}

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { getProdutos, updateProduto, deleteProduto } from "../../../api/Produtos";
 import { getCategorias } from "../../../api/Categorias"; 
 import Grupos from "../grupos/Grupos";
+import FichaTecnica from '../Fichatecnica/FichaTecnica';
+import { formatQtd, stepPorUnidade, isFracionado, UNIDADES_MEDIDA } from "../../../utils/formatQtd";
 import "./Styles.css";
 
 const getBadge = (qtd) => {
@@ -18,6 +20,7 @@ const INITIAL_MODAL_FORM = {
     qtd: 0,
     qtd_max: 0,
     qtd_min: 0,
+    unidade_medida: "UN",
     id_categoria: "", 
     url_foto: "",
     grupos: []
@@ -82,9 +85,10 @@ const Cardapio = () => {
             nome: produto.nome || "",
             descricao: produto.descricao || "", 
             preco: parseFloat(produto.preco) || 0,
-            qtd: produto.qtd || 0,
-            qtd_max: produto.qtd_max || 0,
-            qtd_min: produto.qtd_min || 0,
+            qtd: produto.qtd ?? 0,
+            qtd_max: produto.qtd_max ?? 0,
+            qtd_min: produto.qtd_min ?? 0,
+            unidade_medida: produto.unidade_medida || "UN",
             // Conversão para string para o campo <select>
             id_categoria: String(idCategoriaProduto), 
             url_foto: produto.url_foto || "",
@@ -99,6 +103,25 @@ const Cardapio = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     }, []);
 
+    // Ao trocar a unidade de medida, reprocessa qtd/qtd_max/qtd_min pra regra certa:
+    // UN -> inteiro (arredonda), fracionado (KG/G/L/ML) -> mantém casas decimais
+    const handleUnidadeChange = useCallback((e) => {
+        const novaUnidade = e.target.value;
+        setFormData(prev => {
+            const ajustarValor = (valor) => {
+                const num = Number(valor) || 0;
+                return isFracionado(novaUnidade) ? num : Math.round(num);
+            };
+            return {
+                ...prev,
+                unidade_medida: novaUnidade,
+                qtd: ajustarValor(prev.qtd),
+                qtd_max: ajustarValor(prev.qtd_max),
+                qtd_min: ajustarValor(prev.qtd_min),
+            };
+        });
+    }, []);
+
     const handleEditImageUrl = useCallback(() => {
         const url = prompt("Informe a nova URL da foto:", formData.url_foto);
         if (url !== null) {
@@ -109,14 +132,22 @@ const Cardapio = () => {
     // 5. Funções de Ação (Update e Delete)
     const handleUpdateProduto = async () => {
         if (!produtoEdit) return;
+
+        const fracionado = isFracionado(formData.unidade_medida);
+        // UN só aceita inteiro; unidades fracionadas guardam até 3 casas decimais
+        const parseQtd = (valor) => {
+            const num = Number(valor) || 0;
+            return fracionado ? Number(num.toFixed(3)) : Math.round(num);
+        };
         
         const payload = {
             nome: formData.nome,
             descricao: formData.descricao, 
             preco: parseFloat(formData.preco),
-            qtd: parseInt(formData.qtd),
-            qtd_max: parseInt(formData.qtd_max),
-            qtd_min: parseInt(formData.qtd_min),
+            qtd: parseQtd(formData.qtd),
+            qtd_max: parseQtd(formData.qtd_max),
+            qtd_min: parseQtd(formData.qtd_min),
+            unidade_medida: formData.unidade_medida,
             id_categoria: parseInt(formData.id_categoria), 
             url_foto: formData.url_foto,
             grupos: formData.grupos.map((g) => ({
@@ -182,7 +213,7 @@ const Cardapio = () => {
                                         </button>
                                         {p.url_foto && <img src={p.url_foto} alt={p.nome} />}
                                         <h5>{p.nome}</h5>
-                                        <p>Qtd: {p.qtd} | R$ {parseFloat(p.preco).toFixed(2)}</p>
+                                        <p>Qtd: {formatQtd(p.qtd, p.unidade_medida)} | R$ {parseFloat(p.preco).toFixed(2)}</p>
                                         <span className={`badge ${badge.color}`}>{badge.text}</span>
                                     </div>
                                 );
@@ -215,6 +246,12 @@ const Cardapio = () => {
                             >
                                 Grupos
                             </button>
+                            <button 
+                                className={`btn ${activeTab === "ficha" ? "salvar" : ""}`} 
+                                onClick={() => setActiveTab("ficha")}
+                            >
+                                Ficha Técnica
+                            </button>
                         </div>
 
                         {activeTab === "informacoes" && (
@@ -229,19 +266,48 @@ const Cardapio = () => {
                                 </div>
                                 <div className="form-group">
                                     <label>Preço</label>
-                                    <input type="number" name="preco" value={formData.preco} onChange={handleInputChange} />
+                                    <input type="number" step="0.01" name="preco" value={formData.preco} onChange={handleInputChange} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Unidade de Medida</label>
+                                    <select name="unidade_medida" value={formData.unidade_medida} onChange={handleUnidadeChange}>
+                                        {UNIDADES_MEDIDA.map(u => (
+                                            <option key={u} value={u}>{u}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label>Qtd</label>
-                                    <input type="number" name="qtd" value={formData.qtd} onChange={handleInputChange} />
+                                    <input
+                                        type="number"
+                                        step={stepPorUnidade(formData.unidade_medida)}
+                                        min="0"
+                                        name="qtd"
+                                        value={formData.qtd}
+                                        onChange={handleInputChange}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Qtd Máx</label>
-                                    <input type="number" name="qtd_max" value={formData.qtd_max} onChange={handleInputChange} />
+                                    <input
+                                        type="number"
+                                        step={stepPorUnidade(formData.unidade_medida)}
+                                        min="0"
+                                        name="qtd_max"
+                                        value={formData.qtd_max}
+                                        onChange={handleInputChange}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Qtd Min</label>
-                                    <input type="number" name="qtd_min" value={formData.qtd_min} onChange={handleInputChange} />
+                                    <input
+                                        type="number"
+                                        step={stepPorUnidade(formData.unidade_medida)}
+                                        min="0"
+                                        name="qtd_min"
+                                        value={formData.qtd_min}
+                                        onChange={handleInputChange}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Categoria</label>
@@ -262,6 +328,10 @@ const Cardapio = () => {
                                 grupos={formData.grupos || []} 
                                 setGrupos={novosGrupos => setFormData(prev => ({ ...prev, grupos: novosGrupos }))} 
                             />
+                        )}
+
+                        {activeTab === "ficha" && (
+                            <FichaTecnica idProduto={produtoEdit?.id_produto} />
                         )}
 
                         <div className="modal-actions">

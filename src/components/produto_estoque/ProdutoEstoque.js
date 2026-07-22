@@ -5,6 +5,7 @@ import React, { useState, useCallback } from 'react';
 import Categorias from './categorias/Categorias'; 
 import CadProdutos from './produtos/CadProdutos';
 import Cardapio from './cardapio/Cardapio';
+import Insumos from './insumos/Insumos';
 import './Styles.css';
 
 const ProdutoEstoque = () => {
@@ -21,6 +22,9 @@ const ProdutoEstoque = () => {
         <div className="produto-estoque-container">
             {/* Categorias (Geralmente um painel menor) */}
             <Categorias />
+
+            {/* Insumos (matéria-prima usada nas fichas técnicas dos produtos) */}
+            <Insumos />
 
             {/* Cadastro de Produtos (Geralmente um painel de formulário) */}
             <CadProdutos onUpdate={atualizarCardapio} />

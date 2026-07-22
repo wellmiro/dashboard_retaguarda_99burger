@@ -1,0 +1,463 @@
+/* =========================================================
+   ESTILOS PAINEL DE INSUMOS & ESTOQUE
+   ========================================================= */
+
+#insumosWrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  border-top: 5px solid #2563eb;
+  border-left: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  border-bottom: 2px solid #cbd5e1;
+  font-family: inherit;
+}
+
+#insumosWrapper .insumos-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.35rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+#insumosWrapper .sub-title {
+  margin: 0 0 20px 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Form de Cadastro do Topo */
+#insumosWrapper .form-insumo {
+  background-color: #f1f5f9;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  margin-bottom: 22px;
+}
+
+#insumosWrapper .form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#insumosWrapper .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 120px;
+}
+
+#insumosWrapper .form-group.flex-2 {
+  flex: 2;
+  min-width: 220px;
+}
+
+#insumosWrapper .form-label {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#insumosWrapper .form-control,
+#insumosWrapper .form-select {
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+#insumosWrapper .form-control:focus,
+#insumosWrapper .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+#insumosWrapper .form-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#insumosWrapper .btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#insumosWrapper .btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+/* Busca */
+#insumosWrapper .busca-wrapper {
+  margin-bottom: 20px;
+}
+
+#insumosWrapper .busca-input {
+  max-width: 380px;
+}
+
+/* Grid de Cards dos Insumos */
+#insumosWrapper .insumos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+#insumosWrapper .mensagem-vazia {
+  grid-column: 1 / -1;
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* CARDS DE INSUMO */
+#insumosWrapper .insumo-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+#insumosWrapper .insumo-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12);
+  transform: translateY(-2px);
+}
+
+#insumosWrapper .insumo-card.em-alerta {
+  background-color: #fff5f5;
+  border-color: #fca5a5;
+}
+
+#insumosWrapper .card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+#insumosWrapper .insumo-titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#insumosWrapper .card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#insumosWrapper .btn-card-action {
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+
+#insumosWrapper .btn-card-action:hover {
+  background-color: #e2e8f0;
+}
+
+#insumosWrapper .btn-card-action.btn-delete:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+
+#insumosWrapper .card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+#insumosWrapper .qtd-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#insumosWrapper .qtd-destaque {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+#insumosWrapper .qtd-destaque small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+#insumosWrapper .badge-alerta {
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid #fca5a5;
+}
+
+#insumosWrapper .card-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+#insumosWrapper .info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#insumosWrapper .info-item.align-right {
+  text-align: right;
+}
+
+#insumosWrapper .card-label {
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+#insumosWrapper .card-val {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* =========================================================
+   ESTILOS DOS MODAIS (LAYOUT LIMPO E CORRIGIDO)
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.modal-box {
+  background: #ffffff !important;
+  padding: 20px 24px 24px 24px !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  max-width: 480px !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  box-sizing: border-box !important;
+}
+
+.modal-box form {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  gap: 16px !important;
+  margin: 0 !important;
+}
+
+.modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.modal-header h3 {
+  margin: 0 !important;
+  font-size: 1.15rem !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+.btn-close {
+  background: transparent !important;
+  border: none !important;
+  font-size: 1.1rem !important;
+  cursor: pointer !important;
+  color: #64748b !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-close:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Caixa cinza interna dos campos */
+.modal-body-card {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Form Groups dentro do modal */
+.modal-body-card .form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  width: 100% !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+/* Linhas com 2 campos lado a lado */
+.modal-body-card .form-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.modal-body-card .form-label {
+  font-size: 0.725rem !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+.modal-body-card .form-control,
+.modal-body-card .form-select {
+  padding: 9px 12px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  font-size: 0.9rem !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-body-card .form-control:focus,
+.modal-body-card .form-select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.modal-text {
+  color: #475569 !important;
+  font-size: 0.95rem !important;
+  margin: 8px 0 16px 0 !important;
+}
+
+/* Rodapé com botões à direita */
+.modal-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+}
+
+.modal-box .btn-secondary {
+  background: #e2e8f0 !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  color: #334155 !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.modal-box .btn-secondary:hover {
+  background: #cbd5e1 !important;
+}
+
+.modal-box .btn-danger {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.modal-box .btn-danger:hover {
+  background: #b91c1c !important;
+}
+
+.modal-box .btn-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 10px 22px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.modal-box .btn-primary:hover {
+  background-color: #1d4ed8 !important;
+}
