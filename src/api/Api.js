@@ -62,6 +62,15 @@ export const getUsuario = (id) => api.get(`/usuarios/${id}`);
 
 // --- DASHBOARD ---
 export const getDashboard = () => api.get("/dashboard");
-export const getEstabelecimentoDashboard = () => api.get("/dashboard/estabelecimento"); // 🟢 ADICIONADO COM SUCESSO
+export const getEstabelecimentoDashboard = () => api.get("/dashboard/estabelecimento"); 
+
+// --- FICHA TÉCNICA (ADICIONADO) ---
+export const getFichaTecnica = (idProduto) => api.get(`/produtos/${idProduto}/ficha`);
+export const createFichaTecnicaItem = (idProduto, data) => api.post(`/produtos/${idProduto}/ficha`, data);
+export const updateFichaTecnicaItem = (idFicha, data) => api.put(`/produtos/ficha/${idFicha}`, data);
+export const deleteFichaTecnicaItem = (idFicha) => api.delete(`/produtos/ficha/${idFicha}`);
+
+// --- INSUMOS (ADICIONADO) ---
+export const getInsumos = () => api.get("/insumos");
 
 export default api;

@@ -29,6 +29,10 @@ export default function FichaTecnica({
   });
 
   const carregarDados = useCallback(async () => {
+    if (!idProduto) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     setErro("");
     try {
@@ -87,6 +91,10 @@ export default function FichaTecnica({
 
   const adicionarIngrediente = async (e) => {
     e.preventDefault();
+    if (!idProduto) {
+      setErro("ID do produto inválido.");
+      return;
+    }
     if (!novoInsumoId) {
       setErro("Selecione um insumo.");
       return;
@@ -102,7 +110,8 @@ export default function FichaTecnica({
     setIsSalvando(true);
 
     try {
-      await api.post(`/produtos/${idProduto}/ficha`, {
+      await api.post(`/produtos/ficha`, {
+        id_produto: Number(idProduto),
         id_insumo: Number(novoInsumoId),
         qtd_consumida: Number(valor.toFixed(3)),
       });
@@ -113,7 +122,7 @@ export default function FichaTecnica({
       await carregarDados();
       setTimeout(() => setSucesso(""), 2500);
     } catch (err) {
-      setErro(err.response?.data?.message || "Erro ao adicionar ingrediente.");
+      setErro(err.response?.data?.erro || err.response?.data?.message || "Erro ao adicionar ingrediente.");
     } finally {
       setIsSalvando(false);
     }
@@ -180,7 +189,7 @@ export default function FichaTecnica({
 
   return (
     <div className="ficha-tecnica-container">
-      <h2 className="titulo">Ficha Técnica (Ingredientes deste produto)</h2>
+      <h2 className="titulo">Ficha Técnica ({produtoNome} - ID: {idProduto})</h2>
       <div className="divider" />
       <p className="sub-title">
         Toda vez que este produto for vendido e o pedido for finalizado, o sistema
@@ -197,7 +206,7 @@ export default function FichaTecnica({
               onChange={(e) => setNovoInsumoId(e.target.value)}
             >
               <option value="">Selecione o insumo...</option>
-              {insunosDisponiveisMap(insumosDisponiveis).map((insumo) => (
+              {insumosDisponiveisMap(insumosDisponiveis).map((insumo) => (
                 <option key={insumo.id_insumo} value={insumo.id_insumo}>
                   {insumo.nome} ({insumo.unidade_medida})
                 </option>
@@ -329,13 +338,6 @@ export default function FichaTecnica({
   );
 }
 
-function insunosDisponiveisMap(arr) {
+function insumosDisponiveisMap(arr) {
   return Array.isArray(arr) ? arr : [];
 }
-
-// nova versao
-// versao 2
-// versao 3
-// versao 4
-// versao 5
-//versao 6

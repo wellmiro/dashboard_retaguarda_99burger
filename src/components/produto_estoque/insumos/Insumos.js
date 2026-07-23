@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getInsumos, postInsumo, putInsumo, deleteInsumo } from '../../../api/Insumos';
 import './Styles.css';
 
-// Remove os zeros extras do MySQL/PT-BR ("60.000000" -> "60" | "1,50" -> "1.5")
+// Remove os zeros extras do MySQL/PT-BR ("60.000000" -> "60" | "1.50" -> "1.5")
 const limparNumero = (val) => {
   if (val === null || val === undefined || val === '') return '0';
   const str = String(val).replace(',', '.');
@@ -90,7 +90,7 @@ const Insumos = () => {
     }
   };
 
-  // Abrir Modal de Edição
+  // Abrir Modal de Edição (Limpa os decimais truncados do MySQL)
   const abrirModalEdicao = (item) => {
     setInsumoParaEditar({
       ...item,
@@ -282,8 +282,11 @@ const Insumos = () => {
       {insumoParaExcluir && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>⚠️ Confirmar Exclusão</h3>
-            <p>Deseja realmente excluir o insumo <strong>"{insumoParaExcluir.nome}"</strong>?</p>
+            <div className="modal-header">
+              <h3>⚠️ Confirmar Exclusão</h3>
+              <button type="button" className="btn-close" onClick={() => setInsumoParaExcluir(null)}>✕</button>
+            </div>
+            <p className="modal-text">Deseja realmente excluir o insumo <strong>"{insumoParaExcluir.nome}"</strong>?</p>
             <div className="modal-actions">
               <button type="button" className="btn-secondary" onClick={() => setInsumoParaExcluir(null)}>
                 Cancelar
@@ -305,71 +308,73 @@ const Insumos = () => {
               <button type="button" className="btn-close" onClick={() => setInsumoParaEditar(null)}>✕</button>
             </div>
 
-            <form onSubmit={handleSalvarEdicao} className="modal-form">
-              <div className="form-group" style={{ marginBottom: '14px' }}>
-                <label className="form-label">Nome do Insumo</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={insumoParaEditar.nome}
-                  onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, nome: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-row" style={{ marginBottom: '14px' }}>
+            <form onSubmit={handleSalvarEdicao}>
+              <div className="modal-body-card">
                 <div className="form-group">
-                  <label className="form-label">Unidade</label>
-                  <select
-                    className="form-select"
-                    value={insumoParaEditar.unidade_medida}
-                    onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, unidade_medida: e.target.value })}
-                  >
-                    <option value="UN">UN</option>
-                    <option value="KG">KG</option>
-                    <option value="G">G</option>
-                    <option value="L">L</option>
-                    <option value="ML">ML</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Qtd. Atual</label>
+                  <label className="form-label">Nome do Insumo</label>
                   <input
-                    type="number"
-                    step="any"
+                    type="text"
                     className="form-control"
-                    value={insumoParaEditar.qtd_atual}
-                    onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, qtd_atual: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Qtd. Mínima</label>
-                  <input
-                    type="number"
-                    step="any"
-                    className="form-control"
-                    value={insumoParaEditar.qtd_minima}
-                    onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, qtd_minima: e.target.value })}
+                    value={insumoParaEditar.nome}
+                    onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, nome: e.target.value })}
+                    required
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Custo Unit. (R$)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="form-control"
-                    value={insumoParaEditar.custo_unitario}
-                    onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, custo_unitario: e.target.value })}
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Unidade</label>
+                    <select
+                      className="form-select"
+                      value={insumoParaEditar.unidade_medida}
+                      onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, unidade_medida: e.target.value })}
+                    >
+                      <option value="UN">UN</option>
+                      <option value="KG">KG</option>
+                      <option value="G">G</option>
+                      <option value="L">L</option>
+                      <option value="ML">ML</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Qtd. Atual</label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="form-control"
+                      value={insumoParaEditar.qtd_atual}
+                      onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, qtd_atual: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Qtd. Mínima</label>
+                    <input
+                      type="number"
+                      step="any"
+                      className="form-control"
+                      value={insumoParaEditar.qtd_minima}
+                      onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, qtd_minima: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Custo Unit. (R$)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="form-control"
+                      value={insumoParaEditar.custo_unitario}
+                      onChange={(e) => setInsumoParaEditar({ ...insumoParaEditar, custo_unitario: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="modal-actions" style={{ marginTop: '20px' }}>
+              <div className="modal-actions">
                 <button type="button" className="btn-secondary" onClick={() => setInsumoParaEditar(null)}>
                   Cancelar
                 </button>

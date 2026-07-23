@@ -12,7 +12,6 @@ const getBadge = (qtd) => {
     return { text: "Ativo", color: "verde" };
 };
 
-// Define o estado inicial do formulário para o modal de edição
 const INITIAL_MODAL_FORM = {
     nome: "",
     descricao: "", 
@@ -26,7 +25,6 @@ const INITIAL_MODAL_FORM = {
     grupos: []
 };
 
-
 const Cardapio = () => {
     const [produtosState, setProdutosState] = useState([]);
     const [categoriasList, setCategoriasList] = useState([]); 
@@ -35,11 +33,9 @@ const Cardapio = () => {
     const [formData, setFormData] = useState(INITIAL_MODAL_FORM);
     const [isLoading, setIsLoading] = useState(true);
 
-    // 2. Funções de Busca da API com useCallback
     const fetchCategorias = useCallback(async () => {
         try {
             const response = await getCategorias(); 
-            // Garante que a lista é um array, mesmo em caso de erro na resposta
             const dataArray = Array.isArray(response.data) ? response.data : [];
             setCategoriasList(dataArray);
         } catch (err) {
@@ -52,7 +48,6 @@ const Cardapio = () => {
         setIsLoading(true);
         try {
             const response = await getProdutos();
-             // Garante que a lista é um array
             const dataArray = Array.isArray(response.data) ? response.data : [];
             setProdutosState(dataArray);
         } catch (err) {
@@ -63,22 +58,24 @@ const Cardapio = () => {
         }
     }, []);
 
-    // 1. Efeitos iniciais: Carregar produtos e categorias
     useEffect(() => {
         fetchCategorias();
         fetchProdutos(); 
-    }, [fetchCategorias, fetchProdutos]); // Dependências adicionadas
+    }, [fetchCategorias, fetchProdutos]);
 
-    // 3. Processamento para renderização
-    // Usando `categoriasList` para agrupar e garantir que apenas categorias com produtos sejam exibidas
     const categoriasComProdutos = categoriasList.filter(cat => 
         produtosState.some(p => p.id_categoria === cat.id_categoria)
     );
 
     const handleEditClick = useCallback((produto) => {
+        if (!produto || !produto.id_produto) {
+            alert("Erro: Produto inválido ou ID não encontrado.");
+            return;
+        }
+
+        console.log("Selecionando produto real:", produto);
         setProdutoEdit(produto);
 
-        // Encontra o id_categoria (melhor usar o id diretamente se for passado)
         const idCategoriaProduto = produto.id_categoria || "";
 
         setFormData({
@@ -89,7 +86,6 @@ const Cardapio = () => {
             qtd_max: produto.qtd_max ?? 0,
             qtd_min: produto.qtd_min ?? 0,
             unidade_medida: produto.unidade_medida || "UN",
-            // Conversão para string para o campo <select>
             id_categoria: String(idCategoriaProduto), 
             url_foto: produto.url_foto || "",
             grupos: produto.grupos || []
@@ -103,8 +99,6 @@ const Cardapio = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     }, []);
 
-    // Ao trocar a unidade de medida, reprocessa qtd/qtd_max/qtd_min pra regra certa:
-    // UN -> inteiro (arredonda), fracionado (KG/G/L/ML) -> mantém casas decimais
     const handleUnidadeChange = useCallback((e) => {
         const novaUnidade = e.target.value;
         setFormData(prev => {
@@ -129,12 +123,13 @@ const Cardapio = () => {
         }
     }, [formData.url_foto]);
 
-    // 5. Funções de Ação (Update e Delete)
     const handleUpdateProduto = async () => {
-        if (!produtoEdit) return;
+        if (!produtoEdit || !produtoEdit.id_produto) {
+            alert("Erro: ID do produto não encontrado!");
+            return;
+        }
 
         const fracionado = isFracionado(formData.unidade_medida);
-        // UN só aceita inteiro; unidades fracionadas guardam até 3 casas decimais
         const parseQtd = (valor) => {
             const num = Number(valor) || 0;
             return fracionado ? Number(num.toFixed(3)) : Math.round(num);
@@ -156,11 +151,14 @@ const Cardapio = () => {
             }))
         };
 
+        // LOG EXATO DO ID E DA VARIÁVEL NO MOMENTO DO PUT
+        console.log("🚀 [PUT ATUALIZAR] ID:", produtoEdit.id_produto, "| Payload:", payload);
+
         try {
             await updateProduto(produtoEdit.id_produto, payload);
             alert("Produto atualizado com sucesso!");
-            fetchProdutos(); // Atualiza a lista
-            setProdutoEdit(null); // Fecha o modal
+            fetchProdutos(); 
+            setProdutoEdit(null); 
         } catch (err) {
             console.error("Erro ao atualizar produto:", err.response?.data || err);
             alert(`Erro ao atualizar produto! Detalhe: ${err.response?.data?.message || "Verifique o console."}`);
@@ -168,12 +166,17 @@ const Cardapio = () => {
     };
 
     const handleDeleteProduto = async () => {
+        if (!produtoEdit || !produtoEdit.id_produto) {
+            alert("Erro: ID do produto não encontrado!");
+            return;
+        }
+
         if (window.confirm("Deseja realmente deletar este produto?")) {
             try {
                 await deleteProduto(produtoEdit.id_produto);
                 alert("Produto deletado com sucesso!");
-                fetchProdutos(); // Atualiza a lista
-                setProdutoEdit(null); // Fecha o modal
+                fetchProdutos(); 
+                setProdutoEdit(null); 
             } catch (err) {
                 console.error("Erro ao deletar produto:", err);
                 alert("Erro ao deletar produto!");
@@ -181,17 +184,15 @@ const Cardapio = () => {
         }
     };
 
-    // 6. Renderização do Componente
     if (isLoading) {
         return <div className="cardapio-loading">Carregando Cardápio...</div>;
     }
 
     return (
         <div className="cardapio-panel">
-            {/* -------------------- SEÇÃO DE LISTAGEM DE PRODUTOS -------------------- */}
             {categoriasComProdutos.map(cat => {
                 const produtosCat = produtosState
-                    .filter(p => p.id_categoria === cat.id_categoria) // Filtrando por ID de Categoria
+                    .filter(p => p.id_categoria === cat.id_categoria)
                     .sort((a, b) => a.id_produto - b.id_produto);
 
                 return (
@@ -223,8 +224,7 @@ const Cardapio = () => {
                 );
             })}
             
-            {/* ... (Modal de Edição) ... */}
-            {produtoEdit && (
+            {produtoEdit && produtoEdit.id_produto && (
                 <div className="modal-overlay" onClick={() => setProdutoEdit(null)}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         
@@ -313,7 +313,6 @@ const Cardapio = () => {
                                     <label>Categoria</label>
                                     <select name="id_categoria" value={formData.id_categoria} onChange={handleInputChange}>
                                         <option value="">Selecione...</option>
-                                        {/* Mapeia a lista de categorias corretamente */}
                                         {categoriasList.map(c => (
                                             <option key={c.id_categoria} value={c.id_categoria}>{c.descricao}</option>
                                         ))}
@@ -324,14 +323,14 @@ const Cardapio = () => {
 
                         {activeTab === "grupos" && (
                             <Grupos 
-                                idProduto={produtoEdit?.id_produto} 
+                                idProduto={produtoEdit.id_produto} 
                                 grupos={formData.grupos || []} 
                                 setGrupos={novosGrupos => setFormData(prev => ({ ...prev, grupos: novosGrupos }))} 
                             />
                         )}
 
                         {activeTab === "ficha" && (
-                            <FichaTecnica idProduto={produtoEdit?.id_produto} />
+                            <FichaTecnica idProduto={produtoEdit.id_produto} />
                         )}
 
                         <div className="modal-actions">
