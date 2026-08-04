@@ -243,3 +243,46 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* ===== Resumo de custo da Ficha Técnica (adicionar ao Styles.css) ===== */
+.custo-resumo-card {
+  background: #f8f9fb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.custo-resumo-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.custo-resumo-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.custo-resumo-valor {
+  font-weight: 700;
+  color: #111827;
+}
+
+.custo-resumo-valor.positivo {
+  color: #16a34a;
+}
+
+.custo-resumo-valor.negativo {
+  color: #dc2626;
+}
+
+.item-custo {
+  color: #6b7280;
+  font-size: 12px;
+  margin-left: 4px;
+}
