@@ -6,6 +6,7 @@ import "./Styles.css";
 export default function FichaTecnica({
   idProduto,
   produtoNome = "Produto",
+  produtoPreco = null, // preço de venda do produto (opcional, usado para calcular a margem)
   onClose,
 }) {
   const [itens, setItens] = useState([]);
@@ -88,6 +89,26 @@ export default function FichaTecnica({
     }
     return num.toLocaleString("pt-BR", { maximumFractionDigits: 0 }) + ` ${unidade || ""}`;
   };
+
+  const formatMoeda = (valor) => {
+    const num = Number(valor) || 0;
+    return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // Custo de cada linha da ficha técnica: quanto foi consumido x custo unitário do insumo
+  const custoItem = (item) => {
+    const qtd = Number(item.qtd_consumida) || 0;
+    const custoUnit = Number(item.custo_unitario) || 0;
+    return qtd * custoUnit;
+  };
+
+  // Soma o custo de todos os ingredientes = custo de produção do produto
+  const custoTotalProduto = itens.reduce((total, item) => total + custoItem(item), 0);
+
+  const precoVendaNum = produtoPreco !== null && produtoPreco !== undefined ? Number(produtoPreco) : null;
+  const temPrecoVenda = precoVendaNum !== null && !isNaN(precoVendaNum) && precoVendaNum > 0;
+  const margemValor = temPrecoVenda ? precoVendaNum - custoTotalProduto : null;
+  const margemPercentual = temPrecoVenda && precoVendaNum > 0 ? (margemValor / precoVendaNum) * 100 : null;
 
   const adicionarIngrediente = async (e) => {
     e.preventDefault();
@@ -196,6 +217,30 @@ export default function FichaTecnica({
         desconta automaticamente do estoque a quantidade de cada insumo informada aqui.
       </p>
 
+      {/* Resumo de custo do produto, calculado a partir dos insumos da ficha técnica */}
+      {!isLoading && itens.length > 0 && (
+        <div className="custo-resumo-card">
+          <div className="custo-resumo-linha">
+            <span className="custo-resumo-label">Custo de produção (ingredientes)</span>
+            <span className="custo-resumo-valor">R$ {formatMoeda(custoTotalProduto)}</span>
+          </div>
+          {temPrecoVenda && (
+            <>
+              <div className="custo-resumo-linha">
+                <span className="custo-resumo-label">Preço de venda</span>
+                <span className="custo-resumo-valor">R$ {formatMoeda(precoVendaNum)}</span>
+              </div>
+              <div className="custo-resumo-linha">
+                <span className="custo-resumo-label">Margem (lucro bruto)</span>
+                <span className={`custo-resumo-valor ${margemValor < 0 ? "negativo" : "positivo"}`}>
+                  R$ {formatMoeda(margemValor)} ({margemPercentual.toFixed(1)}%)
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Formulário para Adicionar Insumo */}
       <form onSubmit={adicionarIngrediente} className="form-adicionar-ficha">
         <div className="form-adicionar-linha">
@@ -290,6 +335,7 @@ export default function FichaTecnica({
                     <>
                       <span className="item-valor">
                         Consome {formatQtd(item.qtd_consumida, item.unidade_medida)} por venda
+                        <span className="item-custo"> — R$ {formatMoeda(custoItem(item))}</span>
                       </span>
                       <button
                         type="button"

@@ -330,7 +330,11 @@ const Cardapio = () => {
                         )}
 
                         {activeTab === "ficha" && (
-                            <FichaTecnica idProduto={produtoEdit.id_produto} />
+                            <FichaTecnica
+                                idProduto={produtoEdit.id_produto}
+                                produtoNome={formData.nome}
+                                produtoPreco={formData.preco}
+                            />
                         )}
 
                         <div className="modal-actions">
