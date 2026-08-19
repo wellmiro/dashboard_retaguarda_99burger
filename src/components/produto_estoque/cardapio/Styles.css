@@ -291,6 +291,43 @@ body {
   color: #dc2626;
 }
 
+/* ===== Custo exibido direto no card do produto (grade do Cardápio) — colar no Styles.css da pasta cardapio ===== */
+.custo-produto-card {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 2px 0 6px 0;
+}
+
+.margem-inline {
+  font-weight: 600;
+}
+
+.margem-inline.positivo {
+  color: #28a745;
+}
+
+.margem-inline.negativo {
+  color: #dc3545;
+}
+
+/* ===== Campo Qtd travado por ficha técnica (grade/modal do Cardápio) ===== */
+.qtd-ficha-badge {
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: #0d6efd;
+  text-transform: none;
+  border: none;
+  padding: 0;
+}
+
+.modal-form input:disabled {
+  background-color: #eef2ff;
+  color: #3b4a8b;
+  font-weight: 600;
+  cursor: not-allowed;
+  border-color: #c7d2fe;
+}
+
 
 @media (max-width: 1200px) { .product-card { width: 31%; } }
 @media (max-width: 900px)  { .product-card { width: 48%; } }
