@@ -1,18 +1,18 @@
-/* Margem externa para o painel não colar na tela */
-.ranking-produtos-container-geral {
-  padding: 10px 20px 20px 10px; /* Margem Direita e inferior */
+.ranking-container-geral {
+  padding: 20px;
   width: 100%;
   box-sizing: border-box;
 }
 
-.ranking-produtos {
-  background-color: #fff;
+.ranking-card {
+  background-color: #ffffff;
   padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
 }
 
-.ranking-header-filtros {
+.ranking-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,111 +21,117 @@
   gap: 15px;
 }
 
-.titulo-secao {
-  font-size: 1.2rem;
+.ranking-titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
   color: #007bff;
   margin: 0;
-  font-weight: 700;
 }
 
-.filtros-container {
+.ranking-filtros {
   display: flex;
-  gap: 15px;
+  gap: 10px;
 }
 
 .filtro-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #444;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #666;
 }
 
-/* Estilo moderno para o Date Time */
-.input-estilizado {
+.filtro-item input {
+  padding: 5px;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 6px 12px;
-  background-color: #f8f9fa;
-  color: #333;
-  font-family: inherit;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.2s;
-  cursor: pointer;
+  border-radius: 6px;
+  background: #fcfcfc;
 }
 
-.input-estilizado:focus {
-  border-color: #007bff;
-  background-color: #fff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+/* ITENS DA LISTA */
+.ranking-item {
+  margin-bottom: 20px;
 }
 
-.linha-ranking {
+.ranking-info-topo {
+  margin-bottom: 6px;
+}
+
+.categoria-nome {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f2937; /* Quase preto */
+}
+
+.ranking-barra-row {
   display: flex;
   align-items: center;
-  margin-bottom: 18px;
-  width: 100%;
+  gap: 15px;
 }
 
-.label-nome {
-  width: 120px;
-  font-weight: 700;
-  color: #333;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.progresso-bg {
-  flex: 1;
-  height: 22px; /* Barra um pouco mais robusta */
-  background-color: #f0f0f0;
-  border-radius: 11px;
-  margin: 0 15px;
+.barra-fundo {
+  flex: 1; /* Faz a barra ocupar todo o espaço central */
+  height: 24px; /* Barra robusta */
+  background-color: #f3f4f6;
+  border-radius: 12px;
   overflow: hidden;
 }
 
-.progresso-barra {
+.barra-cor {
   height: 100%;
-  border-radius: 11px;
-  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 12px;
+  transition: width 1s ease-in-out;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
 }
 
-.valor-negrito {
-  width: 115px;
-  text-align: right;
+.barra-percentual {
+  color: #fff;
+  font-size: 11px;
   font-weight: 800;
-  color: #222;
-  font-size: 0.95rem;
-  padding-right: 5px; /* Segurança para não colar na borda */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Ajustes Mobile */
-@media (max-width: 768px) {
-  .ranking-produtos-container-geral {
-    padding: 10px;
-  }
-  
-  .ranking-header-filtros {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .linha-ranking {
-    flex-wrap: wrap;
-    margin-bottom: 25px;
-  }
+.categoria-valor {
+  width: 120px;
+  text-align: right;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #374151; /* Cinza escuro elegante */
+  white-space: nowrap;
+}
 
-  .label-nome {
-    width: 100%;
-    margin-bottom: 8px;
-  }
+/* RODAPÉ TOTAL */
+.ranking-footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 2px solid #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .progresso-bg {
-    margin-left: 0;
-    height: 18px;
+.footer-label {
+  font-weight: 800;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.footer-valor {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #374151; /* Cinza nobre */
+}
+
+/* AJUSTE CELULAR */
+@media (max-width: 600px) {
+  .categoria-valor {
+    font-size: 1rem;
+    width: 100px;
+  }
+  .footer-valor {
+    font-size: 1.4rem;
   }
 }
