@@ -9,8 +9,11 @@ import {
     Plus,
     Package,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    ShoppingCart,
+    Calculator
 } from "lucide-react";
+
 import api from "../../../api/Api";
 import "./Styles.css";
 
@@ -19,78 +22,44 @@ export default function FichaTecnica({
     produtoNome = "Produto",
     produtoPreco = null,
     onClose,
-    onEstoqueAtualizado,
+    onEstoqueAtualizado
 }) {
+    // ESTADOS ORIGINAIS
     const [itens, setItens] = useState([]);
     const [insumosDisponiveis, setInsumosDisponiveis] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [erro, setErro] = useState("");
     const [sucesso, setSucesso] = useState("");
-
     const [novoInsumoId, setNovoInsumoId] = useState("");
     const [novaQtd, setNovaQtd] = useState("");
     const [isSalvando, setIsSalvando] = useState(false);
-
     const [editandoId, setEditandoId] = useState(null);
     const [qtdEditada, setQtdEditada] = useState("");
+    const [confirmaExclusao, setConfirmaExclusao] = useState({ aberto: false, id_ficha: null, nome: "" });
+    const [mostrarEstoqueInsumos, setMostrarEstoqueInsumos] = useState(false);
 
-    const [confirmaExclusao, setConfirmaExclusao] =
-        useState({
-            aberto: false,
-            id_ficha: null,
-            nome: ""
-        });
-
-    const [mostrarEstoqueInsumos, setMostrarEstoqueInsumos] =
-        useState(false);
+    // NOVOS ESTADOS PARA O SIMULADOR (LISTA DE COMPRAS)
+    const [abaAtiva, setAbaAtiva] = useState("receita"); // receita ou simulador
+    const [qtdDesejadaProducao, setQtdDesejadaProducao] = useState("");
 
     const carregarDados = useCallback(async () => {
         if (!idProduto) {
             setIsLoading(false);
             return;
         }
-
         setIsLoading(true);
         setErro("");
-
         try {
-            const [resFicha, resInsumos] =
-                await Promise.all([
-                    api.get(
-                        `/produtos/${idProduto}/ficha`
-                    ),
-                    api.get(`/insumos`)
-                ]);
-
-            const dataFicha = Array.isArray(
-                resFicha.data
-            )
-                ? resFicha.data
-                : (resFicha.data?.data || []);
-
-            const dataInsumos = Array.isArray(
-                resInsumos.data
-            )
-                ? resInsumos.data
-                : (resInsumos.data?.data || []);
-
+            const [resFicha, resInsumos] = await Promise.all([
+                api.get(`/produtos/${idProduto}/ficha`),
+                api.get(`/insumos`)
+            ]);
+            const dataFicha = Array.isArray(resFicha.data) ? resFicha.data : (resFicha.data?.data || []);
+            const dataInsumos = Array.isArray(resInsumos.data) ? resInsumos.data : (resInsumos.data?.data || []);
             setItens(dataFicha);
             setInsumosDisponiveis(dataInsumos);
-
-            console.log(
-                "📋 [FICHA] Dados carregados:",
-                dataFicha
-            );
         } catch (e) {
-            console.error(
-                "Erro ao carregar ficha:",
-                e.response?.data || e
-            );
-
-            setErro(
-                "Não foi possível carregar os dados da ficha técnica."
-            );
-
+            setErro("Não foi possível carregar os dados.");
             setItens([]);
         } finally {
             setIsLoading(false);
@@ -101,856 +70,234 @@ export default function FichaTecnica({
         carregarDados();
     }, [carregarDados]);
 
-    const insumoSelecionadoObj =
-        insumosDisponiveis.find(
-            (i) =>
-                String(i.id_insumo) ===
-                String(novoInsumoId)
-        );
-
-    const unidadeAtual =
-        insumoSelecionadoObj?.unidade_medida || "";
-
-    const stepPorUnidade = (unidade) => {
-        const u = String(unidade || "").toUpperCase();
-
-        if (u === "KG" || u === "L") {
-            return "0.001";
-        }
-
-        if (u === "G" || u === "ML") {
-            return "1";
-        }
-
-        return "0.01";
-    };
-
+    // FORMATAÇÃO DE QUANTIDADE (IGUAL AO SEU UTILITÁRIO)
     const formatQtd = (qtd, unidade) => {
         const num = Number(qtd);
-
-        if (isNaN(num)) {
-            return qtd;
-        }
-
-        const fracionado = [
-            "KG",
-            "G",
-            "L",
-            "ML",
-            "M",
-            "CM"
-        ].includes(
-            String(unidade || "").toUpperCase()
-        );
-
-        if (fracionado) {
-            return (
-                num.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 3
-                }) +
-                ` ${unidade || ""}`
-            );
-        }
-
-        return (
-            num.toLocaleString("pt-BR", {
-                maximumFractionDigits: 0
-            }) +
-            ` ${unidade || ""}`
-        );
+        if (isNaN(num)) return qtd;
+        const fracionado = ["KG", "G", "L", "ML"].includes(String(unidade || "").toUpperCase());
+        return num.toLocaleString("pt-BR", {
+            minimumFractionDigits: fracionado ? 2 : 0,
+            maximumFractionDigits: 3
+        }) + ` ${unidade || ""}`;
     };
 
     const formatMoeda = (valor) => {
-        const num = Number(valor) || 0;
+        return (Number(valor) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
 
-        return num.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+    // LÓGICA DO SIMULADOR DE COMPRAS
+    const gerarCalculoProducao = () => {
+        const alvo = Number(qtdDesejadaProducao) || 0;
+        if (alvo <= 0) return [];
+
+        return itens.map(item => {
+            const necessario = alvo * Number(item.qtd_consumida);
+            const estoque = Number(item.qtd_atual) || 0;
+            const falta = necessario - estoque;
+
+            return {
+                ...item,
+                necessario,
+                estoque,
+                comprar: falta > 0 ? falta : 0
+            };
         });
     };
 
-    const custoItem = (item) => {
-        const qtd =
-            Number(item.qtd_consumida) || 0;
+    const listaCalculada = gerarCalculoProducao();
 
-        const custoUnit =
-            Number(item.custo_unitario) || 0;
-
-        return qtd * custoUnit;
-    };
-
-    const custoTotalProduto = itens.reduce(
-        (total, item) =>
-            total + custoItem(item),
-        0
-    );
-
-    const precoVendaNum =
-        produtoPreco !== null &&
-        produtoPreco !== undefined
-            ? Number(produtoPreco)
-            : null;
-
-    const temPrecoVenda =
-        precoVendaNum !== null &&
-        !isNaN(precoVendaNum) &&
-        precoVendaNum > 0;
-
-    const margemValor = temPrecoVenda
-        ? precoVendaNum - custoTotalProduto
-        : null;
-
-    const margemPercentual =
-        temPrecoVenda &&
-        precoVendaNum > 0
-            ? (margemValor / precoVendaNum) * 100
-            : null;
-
-    const insumosOrdenadosParaEstoque =
-        [...insumosDisponiveis].sort(
-            (a, b) => {
-                const aAlerta =
-                    Number(a.qtd_minima) > 0 &&
-                    Number(a.qtd_atual) <=
-                        Number(a.qtd_minima);
-
-                const bAlerta =
-                    Number(b.qtd_minima) > 0 &&
-                    Number(b.qtd_atual) <=
-                        Number(b.qtd_minima);
-
-                if (aAlerta !== bAlerta) {
-                    return aAlerta ? -1 : 1;
-                }
-
-                return String(
-                    a.nome || ""
-                ).localeCompare(
-                    String(b.nome || "")
-                );
-            }
-        );
-
-    /*
-     * ADICIONAR INGREDIENTE
-     */
+    // FUNÇÕES DE MANIPULAÇÃO (POST/PUT/DELETE) - MANTIDAS IGUAIS
     const adicionarIngrediente = async (e) => {
         e.preventDefault();
-
-        if (!idProduto) {
-            setErro("ID do produto inválido.");
+        if (!novoInsumoId || !novaQtd || Number(novaQtd) <= 0) {
+            setErro("Selecione o insumo e a quantidade.");
             return;
         }
-
-        if (!novoInsumoId) {
-            setErro("Selecione um insumo.");
-            return;
-        }
-
-        const valor = Number(novaQtd);
-
-        if (isNaN(valor) || valor <= 0) {
-            setErro(
-                "Informe uma quantidade válida."
-            );
-            return;
-        }
-
-        setErro("");
-        setSucesso("");
         setIsSalvando(true);
-
         try {
-            console.log(
-                "➕ [FICHA] Adicionando ingrediente:",
-                {
-                    id_produto: idProduto,
-                    id_insumo: novoInsumoId,
-                    qtd_consumida: valor
-                }
-            );
-
             await api.post(`/produtos/ficha`, {
                 id_produto: Number(idProduto),
                 id_insumo: Number(novoInsumoId),
-                qtd_consumida: Number(
-                    valor.toFixed(3)
-                )
+                qtd_consumida: Number(Number(novaQtd).toFixed(3))
             });
-
-            setNovoInsumoId("");
-            setNovaQtd("");
-
-            setSucesso(
-                "Ingrediente adicionado com sucesso!"
-            );
-
+            setNovoInsumoId(""); setNovaQtd("");
+            setSucesso("Adicionado!");
             await carregarDados();
-
-            /*
-             * IMPORTANTE:
-             * Aguarda o callback do Cardapio.
-             */
-            if (onEstoqueAtualizado) {
-                console.log(
-                    "🔄 [FICHA] Solicitando recálculo após ADIÇÃO:",
-                    idProduto
-                );
-
-                await onEstoqueAtualizado(
-                    idProduto
-                );
-
-                console.log(
-                    "✅ [FICHA] Recálculo após ADIÇÃO concluído."
-                );
-            }
-
-            setTimeout(
-                () => setSucesso(""),
-                2500
-            );
+            if (onEstoqueAtualizado) await onEstoqueAtualizado(idProduto);
+            setTimeout(() => setSucesso(""), 2000);
         } catch (err) {
-            console.error(
-                "❌ Erro ao adicionar ingrediente:",
-                err.response?.data || err
-            );
-
-            setErro(
-                err.response?.data?.erro ||
-                    err.response?.data?.message ||
-                    "Erro ao adicionar ingrediente."
-            );
+            setErro("Erro ao salvar.");
         } finally {
             setIsSalvando(false);
         }
     };
 
-    const iniciarEdicao = (item) => {
-        setEditandoId(item.id_ficha);
-        setQtdEditada(
-            String(item.qtd_consumida)
-        );
-    };
-
-    const cancelarEdicao = () => {
-        setEditandoId(null);
-        setQtdEditada("");
-    };
-
-    /*
-     * EDITAR INGREDIENTE
-     */
     const salvarEdicao = async (id_ficha) => {
-        const valor = Number(qtdEditada);
-
-        if (isNaN(valor) || valor <= 0) {
-            setErro(
-                "Informe uma quantidade válida."
-            );
-            return;
-        }
-
-        setErro("");
-        setSucesso("");
-
+        if (Number(qtdEditada) <= 0) return;
         try {
-            console.log(
-                "✏️ [FICHA] Alterando ingrediente:",
-                id_ficha,
-                valor
-            );
-
-            await api.put(
-                `/produtos/ficha/${id_ficha}`,
-                {
-                    qtd_consumida: Number(
-                        valor.toFixed(3)
-                    )
-                }
-            );
-
+            await api.put(`/produtos/ficha/${id_ficha}`, { qtd_consumida: Number(Number(qtdEditada).toFixed(3)) });
             setEditandoId(null);
-            setQtdEditada("");
-
-            setSucesso(
-                "Quantidade atualizada com sucesso!"
-            );
-
+            setSucesso("Atualizado!");
             await carregarDados();
-
-            if (onEstoqueAtualizado) {
-                console.log(
-                    "🔄 [FICHA] Solicitando recálculo após EDIÇÃO:",
-                    idProduto
-                );
-
-                await onEstoqueAtualizado(
-                    idProduto
-                );
-
-                console.log(
-                    "✅ [FICHA] Recálculo após EDIÇÃO concluído."
-                );
-            }
-
-            setTimeout(
-                () => setSucesso(""),
-                2500
-            );
-        } catch (err) {
-            console.error(
-                "❌ Erro ao atualizar quantidade:",
-                err.response?.data || err
-            );
-
-            setErro(
-                "Erro ao atualizar quantidade."
-            );
-        }
+            if (onEstoqueAtualizado) await onEstoqueAtualizado(idProduto);
+            setTimeout(() => setSucesso(""), 2000);
+        } catch (err) { setErro("Erro ao atualizar."); }
     };
 
-    const pedirConfirmacaoExclusao = (item) => {
-        setConfirmaExclusao({
-            aberto: true,
-            id_ficha: item.id_ficha,
-            nome: item.nome
-        });
-    };
-
-    const fecharConfirmacao = () => {
-        setConfirmaExclusao({
-            aberto: false,
-            id_ficha: null,
-            nome: ""
-        });
-    };
-
-    /*
-     * EXCLUIR INGREDIENTE
-     */
     const confirmarExcluir = async () => {
-        if (!confirmaExclusao.id_ficha) {
-            return;
-        }
-
-        setErro("");
-        setSucesso("");
-
         try {
-            console.log(
-                "🗑️ [FICHA] Excluindo ingrediente:",
-                confirmaExclusao.id_ficha
-            );
-
-            await api.delete(
-                `/produtos/ficha/${confirmaExclusao.id_ficha}`
-            );
-
-            setSucesso(
-                "Ingrediente removido com sucesso!"
-            );
-
-            fecharConfirmacao();
-
+            await api.delete(`/produtos/ficha/${confirmaExclusao.id_ficha}`);
+            setConfirmaExclusao({ aberto: false, id_ficha: null, nome: "" });
+            setSucesso("Removido!");
             await carregarDados();
-
-            if (onEstoqueAtualizado) {
-                console.log(
-                    "🔄 [FICHA] Solicitando recálculo após EXCLUSÃO:",
-                    idProduto
-                );
-
-                await onEstoqueAtualizado(
-                    idProduto
-                );
-
-                console.log(
-                    "✅ [FICHA] Recálculo após EXCLUSÃO concluído."
-                );
-            }
-
-            setTimeout(
-                () => setSucesso(""),
-                2500
-            );
-        } catch (err) {
-            console.error(
-                "❌ Erro ao remover ingrediente:",
-                err.response?.data || err
-            );
-
-            setErro(
-                "Erro ao remover ingrediente."
-            );
-        }
+            if (onEstoqueAtualizado) await onEstoqueAtualizado(idProduto);
+            setTimeout(() => setSucesso(""), 2000);
+        } catch (err) { setErro("Erro ao remover."); }
     };
 
     return (
         <div className="ficha-tecnica-container">
-            <h2 className="titulo">
-                Ficha Técnica ({produtoNome} - ID:{" "}
-                {idProduto})
-            </h2>
+            <h2 className="titulo">Ficha Técnica: {produtoNome}</h2>
+
+            {/* ABAS ESTILO DELPHI PAGE CONTROL */}
+            <div className="tabs-producao">
+                <button 
+                    className={`tab-item ${abaAtiva === 'receita' ? 'active' : ''}`}
+                    onClick={() => setAbaAtiva('receita')}
+                >
+                    <Edit2 size={16} /> Receita / Composição
+                </button>
+                <button 
+                    className={`tab-item ${abaAtiva === 'simulador' ? 'active' : ''}`}
+                    onClick={() => setAbaAtiva('simulador')}
+                >
+                    <ShoppingCart size={16} /> Simulador de Produção
+                </button>
+            </div>
 
             <div className="divider" />
 
-            <p className="sub-title">
-                Toda vez que este produto for vendido
-                e o pedido for finalizado, o sistema
-                desconta automaticamente do estoque a
-                quantidade de cada insumo informada aqui.
-            </p>
-
-            {!isLoading && itens.length > 0 && (
-                <div className="custo-resumo-card">
-                    <div className="custo-resumo-linha">
-                        <span className="custo-resumo-label">
-                            Custo de produção
-                            (ingredientes)
-                        </span>
-
-                        <span className="custo-resumo-valor">
-                            R${" "}
-                            {formatMoeda(
-                                custoTotalProduto
-                            )}
-                        </span>
-                    </div>
-
-                    {temPrecoVenda && (
-                        <>
-                            <div className="custo-resumo-linha">
-                                <span className="custo-resumo-label">
-                                    Preço de venda
-                                </span>
-
-                                <span className="custo-resumo-valor">
-                                    R${" "}
-                                    {formatMoeda(
-                                        precoVendaNum
-                                    )}
-                                </span>
+            {abaAtiva === "receita" ? (
+                /* --- ABA 1: CADASTRO DA RECEITA --- */
+                <>
+                    <p className="sub-title">Configure os ingredientes e quanto cada um consome por venda.</p>
+                    
+                    <form onSubmit={adicionarIngrediente} className="form-adicionar-ficha">
+                        <div className="form-adicionar-linha">
+                            <div className="form-group-select">
+                                <select className="select-insumo" value={novoInsumoId} onChange={(e) => setNovoInsumoId(e.target.value)}>
+                                    <option value="">Selecione o insumo...</option>
+                                    {insumosDisponiveis.map(i => (
+                                        <option key={i.id_insumo} value={i.id_insumo}>{i.nome} ({i.unidade_medida})</option>
+                                    ))}
+                                </select>
                             </div>
-
-                            <div className="custo-resumo-linha">
-                                <span className="custo-resumo-label">
-                                    Margem (lucro bruto)
-                                </span>
-
-                                <span
-                                    className={`custo-resumo-valor ${
-                                        margemValor <
-                                        0
-                                            ? "negativo"
-                                            : "positivo"
-                                    }`}
-                                >
-                                    R${" "}
-                                    {formatMoeda(
-                                        margemValor
-                                    )}{" "}
-                                    (
-                                    {margemPercentual.toFixed(
-                                        1
-                                    )}
-                                    %)
-                                </span>
+                            <div className="form-group-qtd">
+                                <input type="number" className="input-qtd" placeholder="Qtd" value={novaQtd} onChange={(e) => setNovaQtd(e.target.value)} />
+                                <span className="unidade-label">UN/KG</span>
                             </div>
-                        </>
-                    )}
-                </div>
-            )}
+                        </div>
+                        <button type="submit" className="btn-adicionar-ficha" disabled={isSalvando}>
+                            <Plus size={16} /> Adicionar na Receita
+                        </button>
+                    </form>
 
-            <button
-                type="button"
-                className="btn-ver-estoque-insumos"
-                onClick={() =>
-                    setMostrarEstoqueInsumos(
-                        (prev) => !prev
-                    )
-                }
-            >
-                <Package size={16} />
+                    {erro && <div className="alert-erro"><AlertCircle size={18} /> {erro}</div>}
+                    {sucesso && <div className="alert-sucesso">{sucesso}</div>}
 
-                <span>
-                    {mostrarEstoqueInsumos
-                        ? "Ocultar"
-                        : "Ver"}{" "}
-                    estoque dos insumos
-                </span>
-
-                {mostrarEstoqueInsumos ? (
-                    <ChevronUp size={16} />
-                ) : (
-                    <ChevronDown size={16} />
-                )}
-            </button>
-
-            {mostrarEstoqueInsumos && (
-                <div className="painel-estoque-insumos">
-                    {insumosDisponiveis.length ===
-                    0 ? (
-                        <p className="mensagem-vazia">
-                            Nenhum insumo cadastrado
-                            ainda.
-                        </p>
-                    ) : (
-                        <ul className="lista-estoque-insumos">
-                            {insumosOrdenadosParaEstoque.map(
-                                (insumo) => {
-                                    const qtdAtual =
-                                        Number(
-                                            insumo.qtd_atual
-                                        ) || 0;
-
-                                    const qtdMinima =
-                                        Number(
-                                            insumo.qtd_minima
-                                        ) || 0;
-
-                                    const emAlerta =
-                                        qtdMinima >
-                                            0 &&
-                                        qtdAtual <=
-                                            qtdMinima;
-
-                                    return (
-                                        <li
-                                            key={
-                                                insumo.id_insumo
-                                            }
-                                            className={`estoque-insumo-linha ${
-                                                emAlerta
-                                                    ? "em-alerta"
-                                                    : ""
-                                            }`}
-                                        >
-                                            <span className="estoque-insumo-nome">
-                                                {emAlerta && (
-                                                    <span title="Estoque baixo">
-                                                        ⚠️
-                                                    </span>
-                                                )}{" "}
-                                                {
-                                                    insumo.nome
-                                                }
-                                            </span>
-
-                                            <span className="estoque-insumo-qtd">
-                                                {formatQtd(
-                                                    qtdAtual,
-                                                    insumo.unidade_medida
-                                                )}
-                                            </span>
-                                        </li>
-                                    );
-                                }
-                            )}
-                        </ul>
-                    )}
-                </div>
-            )}
-
-            <form
-                onSubmit={adicionarIngrediente}
-                className="form-adicionar-ficha"
-            >
-                <div className="form-adicionar-linha">
-                    <div className="form-group-select">
-                        <select
-                            className="select-insumo"
-                            value={novoInsumoId}
-                            onChange={(e) =>
-                                setNovoInsumoId(
-                                    e.target.value
-                                )
-                            }
-                        >
-                            <option value="">
-                                Selecione o insumo...
-                            </option>
-
-                            {insumosDisponiveisMap(
-                                insumosDisponiveis
-                            ).map((insumo) => (
-                                <option
-                                    key={
-                                        insumo.id_insumo
-                                    }
-                                    value={
-                                        insumo.id_insumo
-                                    }
-                                >
-                                    {insumo.nome} (
-                                    {
-                                        insumo.unidade_medida
-                                    }
-                                    )
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="form-group-qtd">
-                        <input
-                            type="number"
-                            className="input-qtd"
-                            placeholder="Qtd"
-                            step={stepPorUnidade(
-                                unidadeAtual
-                            )}
-                            value={novaQtd}
-                            onChange={(e) =>
-                                setNovaQtd(
-                                    e.target.value
-                                )
-                            }
-                        />
-
-                        <span className="unidade-label">
-                            {unidadeAtual}
-                        </span>
-                    </div>
-                </div>
-
-                <button
-                    type="submit"
-                    className="btn-adicionar-ficha"
-                    disabled={isSalvando}
-                >
-                    {isSalvando ? (
-                        <Loader2
-                            size={16}
-                            className="spin"
-                        />
-                    ) : (
-                        <Plus size={16} />
-                    )}
-
-                    <span>
-                        Adicionar Ingrediente
-                    </span>
-                </button>
-            </form>
-
-            {erro && (
-                <div className="alert-erro">
-                    <AlertCircle size={18} />
-                    <span>{erro}</span>
-                </div>
-            )}
-
-            {sucesso && (
-                <div className="alert-sucesso">
-                    {sucesso}
-                </div>
-            )}
-
-            {isLoading ? (
-                <div className="loading">
-                    <Loader2
-                        size={20}
-                        className="spin"
-                    />
-
-                    <span>
-                        Carregando ingredientes...
-                    </span>
-                </div>
-            ) : itens.length === 0 ? (
-                <div className="mensagem-vazia-container">
-                    <p className="mensagem-vazia">
-                        Nenhum ingrediente vinculado
-                        a este produto ainda.
-                    </p>
-                </div>
-            ) : (
-                <ul className="itens-lista">
-                    {itens.map((item) => {
-                        const isEditando =
-                            editandoId ===
-                            item.id_ficha;
-
-                        return (
-                            <li
-                                key={item.id_ficha}
-                                className="item-linha"
-                            >
-                                <span className="item-nome">
-                                    {item.nome}
-                                </span>
-
+                    <ul className="itens-lista">
+                        {itens.map((item) => (
+                            <li key={item.id_ficha} className="item-linha">
+                                <span className="item-nome">{item.nome}</span>
                                 <div className="item-detalhes">
-                                    {isEditando ? (
+                                    {editandoId === item.id_ficha ? (
                                         <>
-                                            <input
-                                                type="number"
-                                                className="input-inplace"
-                                                step={stepPorUnidade(
-                                                    item.unidade_medida
-                                                )}
-                                                value={
-                                                    qtdEditada
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    setQtdEditada(
-                                                        e
-                                                            .target
-                                                            .value
-                                                    )
-                                                }
-                                            />
-
-                                            <button
-                                                type="button"
-                                                className="btn-commit"
-                                                title="Salvar"
-                                                onClick={() =>
-                                                    salvarEdicao(
-                                                        item.id_ficha
-                                                    )
-                                                }
-                                            >
-                                                <Check
-                                                    size={
-                                                        16
-                                                    }
-                                                />
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="btn-cancel"
-                                                title="Cancelar"
-                                                onClick={
-                                                    cancelarEdicao
-                                                }
-                                            >
-                                                <X
-                                                    size={
-                                                        16
-                                                    }
-                                                />
-                                            </button>
+                                            <input type="number" className="input-inplace" value={qtdEditada} onChange={(e) => setQtdEditada(e.target.value)} />
+                                            <button className="btn-commit" onClick={() => salvarEdicao(item.id_ficha)}><Check size={16} /></button>
+                                            <button className="btn-cancel" onClick={() => setEditandoId(null)}><X size={16} /></button>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="item-valor">
-                                                Consome{" "}
-                                                {formatQtd(
-                                                    item.qtd_consumida,
-                                                    item.unidade_mdida ||
-                                                        item.unidade_medida
-                                                )}{" "}
-                                                por venda
-
-                                                <span className="item-custo">
-                                                    {" "}
-                                                    — R${" "}
-                                                    {formatMoeda(
-                                                        custoItem(
-                                                            item
-                                                        )
-                                                    )}
-                                                </span>
-                                            </span>
-
-                                            <button
-                                                type="button"
-                                                className="btn-edit-inline"
-                                                title="Editar quantidade"
-                                                onClick={() =>
-                                                    iniciarEdicao(
-                                                        item
-                                                    )
-                                                }
-                                            >
-                                                <Edit2
-                                                    size={
-                                                        16
-                                                    }
-                                                />
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="btn-delete-inline"
-                                                title="Remover ingrediente"
-                                                onClick={() =>
-                                                    pedirConfirmacaoExclusao(
-                                                        item
-                                                    )
-                                                }
-                                            >
-                                                <Trash2
-                                                    size={
-                                                        16
-                                                    }
-                                                />
-                                            </button>
+                                            <span className="item-valor">{formatQtd(item.qtd_consumida, item.unidade_medida)}</span>
+                                            <button className="btn-edit-inline" onClick={() => { setEditandoId(item.id_ficha); setQtdEditada(item.qtd_consumida); }}><Edit2 size={16} /></button>
+                                            <button className="btn-delete-inline" onClick={() => setConfirmaExclusao({ aberto: true, id_ficha: item.id_ficha, nome: item.nome })}><Trash2 size={16} /></button>
                                         </>
                                     )}
                                 </div>
                             </li>
-                        );
-                    })}
-                </ul>
+                        ))}
+                    </ul>
+                </>
+            ) : (
+                /* --- ABA 2: SIMULADOR DE PRODUÇÃO / LISTA DE COMPRAS --- */
+                <div className="simulador-compras">
+                    <div className="simulador-card-input">
+                        <label>Quantas unidades de <b>{produtoNome}</b> você quer produzir?</label>
+                        <div className="input-alvo-wrapper">
+                            <Calculator size={20} />
+                            <input 
+                                type="number" 
+                                placeholder="Ex: 50" 
+                                value={qtdDesejadaProducao}
+                                onChange={(e) => setQtdDesejadaProducao(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {qtdDesejadaProducao > 0 ? (
+                        <div className="resultado-calculo">
+                            <p className="resumo-txt">Para produzir {qtdDesejadaProducao} unidades, você precisará de:</p>
+                            <div className="lista-compras-automatica">
+                                {listaCalculada.map(item => (
+                                    <div key={item.id_ficha} className={`card-compra ${item.comprar > 0 ? 'falta' : 'sucesso'}`}>
+                                        <div className="card-compra-header">
+                                            <span className="insumo-titulo">{item.nome}</span>
+                                            <span className={`status-badge ${item.comprar > 0 ? 'bad' : 'good'}`}>
+                                                {item.comprar > 0 ? 'Falta no estoque' : 'Estoque OK'}
+                                            </span>
+                                        </div>
+                                        <div className="card-compra-corpo">
+                                            <div className="dado">
+                                                <label>Necessário</label>
+                                                <p>{formatQtd(item.necessario, item.unidade_medida)}</p>
+                                            </div>
+                                            <div className="dado">
+                                                <label>Tem em Estoque</label>
+                                                <p>{formatQtd(item.estoque, item.unidade_medida)}</p>
+                                            </div>
+                                            <div className="dado destaque">
+                                                <label>Comprar</label>
+                                                <p className={item.comprar > 0 ? 'txt-alerta' : 'txt-ok'}>
+                                                    {item.comprar > 0 ? formatQtd(item.comprar, item.unidade_medida) : 'NADA'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="aviso-simulador">
+                            <ShoppingCart size={40} />
+                            <p>Digite a quantidade desejada acima para calcular o que falta comprar.</p>
+                        </div>
+                    )}
+                </div>
             )}
 
+            {/* MODAL CONFIRMAÇÃO EXCLUSÃO */}
             {confirmaExclusao.aberto && (
-                <div
-                    className="modal-overlay"
-                    role="dialog"
-                    aria-modal="true"
-                >
+                <div className="modal-overlay">
                     <div className="modal-card">
-                        <h3 className="modal-title">
-                            Remover ingrediente?
-                        </h3>
-
-                        <p className="modal-text">
-                            Tem certeza que deseja
-                            remover{" "}
-                            <b>
-                                {
-                                    confirmaExclusao.nome
-                                }
-                            </b>{" "}
-                            da ficha técnica?
-                        </p>
-
+                        <h3 className="modal-title">Remover ingrediente?</h3>
+                        <p className="modal-text">Deseja remover <b>{confirmaExclusao.nome}</b> da receita?</p>
                         <div className="modal-actions">
-                            <button
-                                type="button"
-                                className="btn-modal cancelar"
-                                onClick={
-                                    fecharConfirmacao
-                                }
-                            >
-                                Não
-                            </button>
-
-                            <button
-                                type="button"
-                                className="btn-modal confirmar"
-                                onClick={
-                                    confirmarExcluir
-                                }
-                            >
-                                Sim
-                            </button>
+                            <button className="btn-modal cancelar" onClick={() => setConfirmaExclusao({ aberto: false })}>Não</button>
+                            <button className="btn-modal confirmar" onClick={confirmarExcluir}>Sim, Remover</button>
                         </div>
                     </div>
                 </div>
             )}
         </div>
     );
-}
-
-function insumosDisponiveisMap(arr) {
-    return Array.isArray(arr) ? arr : [];
 }

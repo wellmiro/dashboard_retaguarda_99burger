@@ -12,8 +12,10 @@ import Login from "./components/login/Login";
 import CadProdutos from "./components/produto_estoque/produtos/CadProdutos";
 import Insumos from "./components/produto_estoque/insumos/Insumos";
 
-// AQUI ESTÁ A MUDANÇA:
-// Importamos o arquivo .jsx (que é a tela/página)
+// 1. Importação corrigida com "I" maiúsculo:
+import Integracoes from "./components/integracoes/Integracoes.jsx";
+
+// Importamos o arquivo .jsx (que é a tela/página de despesa)
 import PaginaDespesa from "./components/gerenciar/receita_despesa/despesa.jsx"; 
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -46,8 +48,10 @@ function App() {
                     <Route path="/faturas" element={<Faturas />} />
                     <Route path="/financeiro" element={<Financeiro />} /> 
                     
-                    {/* AQUI: Usamos o componente da página .jsx */}
                     <Route path="/receita-despesa" element={<PaginaDespesa />} /> 
+
+                    {/* 2. Rota adicionada aqui: */}
+                    <Route path="/integracoes" element={<Integracoes />} /> 
                     
                     <Route path="/produtos" element={<CadProdutos />} />
                     <Route path="/insumos" element={<Insumos />} />

@@ -1,0 +1,222 @@
+/* src/components/integracoes/Styles.css */
+
+#integracoesWrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  border-top: 5px solid #009ee3; /* Azul oficial do Mercado Pago */
+  border-left: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  border-bottom: 2px solid #cbd5e1;
+  font-family: inherit;
+}
+
+#integracoesWrapper .integracoes-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.35rem;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+#integracoesWrapper .sub-title {
+  margin: 0 0 20px 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Banner de Alerta (Sucesso/Erro) */
+.alerta-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alerta-banner.sucesso {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.alerta-banner.erro {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.btn-fechar-alerta {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 4px;
+}
+
+/* Card Principal da Integração */
+.integracao-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 550px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.integracao-card .card-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.marca-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mp-circulo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.marca-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.categoria-tag {
+  font-size: 0.725rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Badges de Status */
+.badge-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.badge-status.conectado {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.badge-status.desconectado {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+/* Corpo do Card */
+.descricao-servico {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.detalhes-conexao {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detalhe-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.825rem;
+}
+
+.detalhe-item .label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.detalhe-item .valor {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.texto-verde {
+  color: #16a34a !important;
+}
+
+/* Rodapé e Botões */
+.card-rodape {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn-conectar {
+  background-color: #009ee3; /* Azul MP */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-conectar:hover {
+  background-color: #0082bc;
+}
+
+.btn-conectar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-desconectar {
+  background-color: #ffffff;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.825rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-desconectar:hover {
+  background-color: #fee2e2;
+}
+
+.loading-container {
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+}

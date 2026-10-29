@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome, FaStore, FaChartBar, FaFileInvoiceDollar,
   FaBoxOpen, FaCashRegister, FaCog, FaBars, FaSignOutAlt, FaChevronDown,
-  FaWallet // Importei esse ícone novo para diferenciar
+  FaWallet, FaPlug
 } from "react-icons/fa";
 import { MdOutlineDns } from "react-icons/md";
 import "./Styles.css";
@@ -41,7 +41,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
     }
   }, [navigate, isCollapsed, setIsCollapsed]);
 
-  const gerenciarAtivo = ['/pedidos', '/performace', '/faturas', '/receita-despesa'].some(path =>
+  const gerenciarAtivo = ['/pedidos', '/performace', '/faturas', '/receita-despesa', '/integracoes'].some(path =>
     location.pathname === path
   );
   const relatoriosAtivo = ['/vendas', '/estoque', '/financeiro'].some(path =>
@@ -98,8 +98,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
                 <li>{renderLink("/pedidos", <MdOutlineDns />, "Pedidos", true)}</li>
                 <li>{renderLink("/performace", <FaChartBar />, "Performance", true)}</li>
                 <li>{renderLink("/faturas", <FaFileInvoiceDollar />, "Faturas", true)}</li>
-                {/* ÍCONE ALTERADO AQUI PARA NÃO CONFUNDIR COM FATURAS */}
                 <li>{renderLink("/receita-despesa", <FaWallet />, "Receita / Despesa", true)}</li>
+                {/* NOVA OPÇÃO AQUI: */}
+                <li>{renderLink("/integracoes", <FaPlug />, "Integrações", true)}</li>
               </ul>
             </li>
 
