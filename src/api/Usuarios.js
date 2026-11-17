@@ -20,6 +20,7 @@ export const loginUsuario = async (email, senha) => {
     if (token) {
       localStorage.setItem("token", token);
       localStorage.setItem("user_nome", response.data.nome);
+      localStorage.setItem("funcao_usuario", response.data.funcao || "geral");
       
       // Isso aqui garante que o próximo comando já saia com o token
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

@@ -1,139 +1,134 @@
-import React, { useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-  FaHome, FaStore, FaChartBar, FaFileInvoiceDollar,
-  FaBoxOpen, FaCashRegister, FaCog, FaBars, FaSignOutAlt, FaChevronDown,
-  FaWallet, FaPlug
+  FaHome, FaStore, FaChartBar, FaCog, FaSignOutAlt,
+  FaChevronDown, FaChevronLeft, FaChevronRight, FaBoxOpen,
+  FaCashRegister, FaBars
 } from "react-icons/fa";
-import { MdOutlineDns } from "react-icons/md";
 import "./Styles.css";
 
 function Sidebar({ isCollapsed, setIsCollapsed }) {
-  const location = useLocation();
+  const [openMenu, setOpenMenu] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [openSubmenu, setOpenSubmenu] = React.useState(null);
+  const funcaoUsuario = (localStorage.getItem("funcao_usuario") || "").trim().toLowerCase();
+  const isCozinha = funcaoUsuario === "cozinha";
 
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-  const toggleMobileSidebar = () => setMobileOpen(!mobileOpen);
-  
-  const handleSubmenuClick = useCallback((menu) =>
-    setOpenSubmenu(openSubmenu === menu ? null : menu), [openSubmenu]);
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  const toggleMenu = (menuName) => {
+    if (isCollapsed && window.innerWidth > 768) {
+      setIsCollapsed(false);
+      setOpenMenu(menuName);
+    } else {
+      setOpenMenu(openMenu === menuName ? null : menuName);
+    }
+  };
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("id_usuario");
     localStorage.removeItem("nome_usuario");
+    localStorage.removeItem("funcao_usuario");
     navigate("/login");
     setMobileOpen(false);
   };
 
-  const goTo = useCallback((path) => {
-    navigate(path);
-    if (window.innerWidth >= 769) {
-      if (isCollapsed) setIsCollapsed(false);
-      setOpenSubmenu(null); 
-    } else {
-      setTimeout(() => {
-        setMobileOpen(false);
-        setOpenSubmenu(null);
-      }, 100); 
-    }
-  }, [navigate, isCollapsed, setIsCollapsed]);
-
-  const gerenciarAtivo = ['/pedidos', '/performace', '/faturas', '/receita-despesa', '/integracoes'].some(path =>
-    location.pathname === path
-  );
-  const relatoriosAtivo = ['/vendas', '/estoque', '/financeiro'].some(path =>
-    location.pathname === path
-  );
-
-  const gerenciarAberto = openSubmenu === "gerenciarLoja" || gerenciarAtivo;
-  const relatoriosAberto = openSubmenu === "relatorios" || relatoriosAtivo;
-
-  const renderLink = (path, icon, text, isSubItem = false) => {
-    const isActive = location.pathname === path;
-    const itemClass = isSubItem ? "mobile-link submenu-item" : "mobile-link";
-
+  const renderLink = (to, icon, text) => {
+    const isActive = location.pathname === to;
     return (
-      <button
-        onClick={() => goTo(path)}
-        className={isActive ? `${itemClass} active` : itemClass}
-      >
-        {icon && <span className="icon">{icon}</span>}
+      <Link to={to} className={`mobile-link ${isActive ? "active" : ""}`}>
+        <span className="icon">{icon}</span>
         <span className="text">{text}</span>
-      </button>
+      </Link>
     );
   };
 
   return (
     <>
-      <div className="mobile-top-bar">
-        <button className="mobile-toggle-btn" onClick={toggleMobileSidebar}>
+      <div className="mobile-top-bar" style={{ display: window.innerWidth <= 768 ? "block" : "none" }}>
+        <button className="mobile-toggle-btn" onClick={() => setMobileOpen(true)}>
           <FaBars />
         </button>
       </div>
 
-      <div className={`sidebar ${isCollapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
+      {mobileOpen && (
+        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
+      )}
+
+      <aside className={`sidebar ${isCollapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
-             <span className="logo-text">Dashboard</span>
-            <div className="toggle-button" onClick={toggleSidebar}>
-              <FaBars />
-            </div>
+          <span className="logo-text">🍔 99Burger</span>
+
+          <div className="toggle-button" onClick={() => setIsCollapsed(!isCollapsed)}>
+            {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+          </div>
         </div>
 
         <nav className="sidebar-nav">
           <ul>
-            <li>{renderLink("/inicio", <FaHome />, "Início")}</li>
+            {!isCozinha && (
+              <>
+                <li>{renderLink("/inicio", <FaHome />, "Início")}</li>
 
-            <li className="menu-group">
-              <div className={`menu-item-with-arrow ${gerenciarAberto ? "active" : ""}`} onClick={() => handleSubmenuClick("gerenciarLoja")}>
-                <div className="menu-item">
-                  <span className="icon"><FaStore /></span>
-                  <span className="text">Gerenciar Loja</span>
-                </div>
-                <span className={`arrow ${gerenciarAberto ? "open" : ""}`}><FaChevronDown /></span>
-              </div>
-              <ul className={`submenu ${gerenciarAberto ? "open" : ""}`}>
-                <li>{renderLink("/pedidos", <MdOutlineDns />, "Pedidos", true)}</li>
-                <li>{renderLink("/performace", <FaChartBar />, "Performance", true)}</li>
-                <li>{renderLink("/faturas", <FaFileInvoiceDollar />, "Faturas", true)}</li>
-                <li>{renderLink("/receita-despesa", <FaWallet />, "Receita / Despesa", true)}</li>
-                {/* NOVA OPÇÃO AQUI: */}
-                <li>{renderLink("/integracoes", <FaPlug />, "Integrações", true)}</li>
-              </ul>
-            </li>
+                <li>
+                  <div
+                    className={`menu-item-with-arrow ${openMenu === "loja" ? "active" : ""}`}
+                    onClick={() => toggleMenu("loja")}
+                  >
+                    <div className="menu-item">
+                      <span className="icon"><FaStore /></span>
+                      <span className="text">Gerenciar Loja</span>
+                    </div>
+                    <FaChevronDown className={`arrow ${openMenu === "loja" ? "open" : ""}`} />
+                  </div>
+                  <ul className={`submenu ${openMenu === "loja" ? "open" : ""}`}>
+                    <li>{renderLink("/pedidos", null, "Pedidos")}</li>
+                    <li>{renderLink("/produtos", null, "Cardápio / Produtos")}</li>
+                    <li>{renderLink("/clientes", null, "Clientes")}</li>
+                  </ul>
+                </li>
 
-            <li className="menu-group">
-              <div className={`menu-item-with-arrow ${relatoriosAberto ? "active" : ""}`} onClick={() => handleSubmenuClick("relatorios")}>
-                <div className="menu-item">
-                  <span className="icon"><FaChartBar /></span>
-                  <span className="text">Relatórios</span>
-                </div>
-                <span className={`arrow ${relatoriosAberto ? "open" : ""}`}><FaChevronDown /></span>
-              </div>
-              <ul className={`submenu ${relatoriosAberto ? "open" : ""}`}>
-                <li>{renderLink("/vendas", null, "Vendas", true)}</li>
-                <li>{renderLink("/estoque", null, "Estoque", true)}</li>
-                <li>{renderLink("/financeiro", null, "Financeiro", true)}</li>
-              </ul>
-            </li>
+                <li>
+                  <div
+                    className={`menu-item-with-arrow ${openMenu === "relatorios" ? "active" : ""}`}
+                    onClick={() => toggleMenu("relatorios")}
+                  >
+                    <div className="menu-item">
+                      <span className="icon"><FaChartBar /></span>
+                      <span className="text">Relatórios</span>
+                    </div>
+                    <FaChevronDown className={`arrow ${openMenu === "relatorios" ? "open" : ""}`} />
+                  </div>
+                  <ul className={`submenu ${openMenu === "relatorios" ? "open" : ""}`}>
+                    <li>{renderLink("/performace", null, "Performance Geral")}</li>
+                    <li>{renderLink("/vendas", null, "Vendas")}</li>
+                    <li>{renderLink("/faturas", null, "Faturas")}</li>
+                    <li>{renderLink("/financeiro", null, "Financeiro")}</li>
+                    <li>{renderLink("/receita-despesa", null, "Receitas e Despesas")}</li>
+                    <li>{renderLink("/integracoes", null, "Integrações")}</li>
+                  </ul>
+                </li>
 
-            <li>{renderLink("/produto-estoque", <FaBoxOpen />, "Produtos / Estoque")}</li>
-            <li>{renderLink("/fechamento-caixa", <FaCashRegister />, "Fechamento de Caixa")}</li>
-            <li>{renderLink("/configuracoes", <FaCog />, "Configurações")}</li>
+                <li>{renderLink("/produto-estoque", <FaBoxOpen />, "Produtos / Estoque")}</li>
+                <li>{renderLink("/fechamento-caixa", <FaCashRegister />, "Fechamento de Caixa")}</li>
+                <li>{renderLink("/configuracoes", <FaCog />, "Configurações")}</li>
+              </>
+            )}
 
             <li className="logout-section">
-              <button className="logout-link" onClick={handleLogout}>
+              <button className="mobile-link logout-link" onClick={handleLogout}>
                 <span className="icon"><FaSignOutAlt /></span>
                 <span className="text">Desconectar</span>
               </button>
             </li>
           </ul>
         </nav>
-      </div>
-
-      {mobileOpen && <div className="sidebar-overlay" onClick={toggleMobileSidebar}></div>}
+      </aside>
     </>
   );
 }

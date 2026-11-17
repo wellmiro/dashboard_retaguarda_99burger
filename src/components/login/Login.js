@@ -24,18 +24,20 @@ function Login({ onLoginSuccess }) {
       const usuario = await loginUsuario(email, senha);
 
       if (usuario && usuario.id_usuario) {
-        // --- A LINHA QUE SALVA O SISTEMA ---
+        const funcaoAtual = (usuario.funcao || "geral").trim().toLowerCase();
+
         localStorage.setItem("token", usuario.token); 
-        
         localStorage.setItem("id_usuario", usuario.id_usuario);
         localStorage.setItem("nome_usuario", usuario.nome);
         localStorage.setItem("email_usuario", usuario.email);
         localStorage.setItem("status_usuario", usuario.status);
         localStorage.setItem("dt_cadastro_usuario", usuario.dt_cadastro);
+        localStorage.setItem("funcao_usuario", funcaoAtual);
 
         if (onLoginSuccess) { onLoginSuccess(); }
 
-        setTimeout(() => { navigate("/inicio"); }, 200);
+        const destino = funcaoAtual === "cozinha" ? "/produto-estoque" : "/inicio";
+        setTimeout(() => { navigate(destino); }, 200);
       } else {
         throw new Error("Dados de usuário inválidos");
       }
