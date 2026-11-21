@@ -11,6 +11,7 @@ import Insumos from "./components/produto_estoque/insumos/Insumos";
 import Vendas from "./components/relatorios/vendas/Vendas";
 import Estoque from "./components/relatorios/estoque/Estoque";
 import ProdutoEstoque from "./components/produto_estoque/ProdutoEstoque";
+import Integracoes from "./components/integracoes/Integracoes";
 import "./App.css";
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
                         <Route path="/vendas" element={<Vendas />} />
                         <Route path="/estoque" element={<Estoque />} />
                         <Route path="/produto-estoque" element={<ProdutoEstoque />} />
+                        <Route path="/integracoes" element={<Integracoes />} />
                         <Route path="*" element={<Navigate to="/inicio" />} />
                       </>
                     )}
