@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FaHome, FaStore, FaChartBar, FaCog, FaSignOutAlt,
   FaChevronDown, FaChevronLeft, FaChevronRight, FaBoxOpen,
-  FaCashRegister, FaBars
+  FaCashRegister, FaBars, FaMotorcycle
 } from "react-icons/fa";
 import "./Styles.css";
 
@@ -15,6 +15,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
 
   const funcaoUsuario = (localStorage.getItem("funcao_usuario") || "").trim().toLowerCase();
   const isCozinha = funcaoUsuario === "cozinha";
+  const isMotoboy = funcaoUsuario === "motoboy";
 
   useEffect(() => {
     setMobileOpen(false);
@@ -33,6 +34,9 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
     localStorage.removeItem("token");
     localStorage.removeItem("id_usuario");
     localStorage.removeItem("nome_usuario");
+    localStorage.removeItem("email_usuario");
+    localStorage.removeItem("status_usuario");
+    localStorage.removeItem("dt_cadastro_usuario");
     localStorage.removeItem("funcao_usuario");
     navigate("/login");
     setMobileOpen(false);
@@ -71,7 +75,7 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
 
         <nav className="sidebar-nav">
           <ul>
-            {!isCozinha && (
+            {!isCozinha && !isMotoboy && (
               <>
                 <li>{renderLink("/inicio", <FaHome />, "Início")}</li>
 
@@ -118,6 +122,10 @@ function Sidebar({ isCollapsed, setIsCollapsed }) {
                 <li>{renderLink("/fechamento-caixa", <FaCashRegister />, "Fechamento de Caixa")}</li>
                 <li>{renderLink("/configuracoes", <FaCog />, "Configurações")}</li>
               </>
+            )}
+
+            {isMotoboy && (
+              <li>{renderLink("/configurar-rotas", <FaMotorcycle />, "Rotas e Taxas")}</li>
             )}
 
             <li className="logout-section">

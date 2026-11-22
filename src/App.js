@@ -12,6 +12,7 @@ import Vendas from "./components/relatorios/vendas/Vendas";
 import Estoque from "./components/relatorios/estoque/Estoque";
 import ProdutoEstoque from "./components/produto_estoque/ProdutoEstoque";
 import Integracoes from "./components/integracoes/Integracoes";
+import ConfigRotasMotoboy from "./components/motoboy/ConfigRotasMotoboy";
 import "./App.css";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   };
 
   const isCozinha = (funcao || "").trim().toLowerCase() === "cozinha";
+  const isMotoboy = (funcao || "").trim().toLowerCase() === "motoboy";
 
   return (
     <Router>
@@ -46,6 +48,11 @@ function App() {
                         <Route path="/produtos" element={<CadProdutos />} />
                         <Route path="/insumos" element={<Insumos />} />
                         <Route path="*" element={<Navigate to="/produto-estoque" />} />
+                      </>
+                    ) : isMotoboy ? (
+                      <>
+                        <Route path="/configurar-rotas" element={<ConfigRotasMotoboy />} />
+                        <Route path="*" element={<Navigate to="/configurar-rotas" />} />
                       </>
                     ) : (
                       <>
@@ -76,4 +83,3 @@ function App() {
 }
 
 export default App;
-// atualização da integraçãogit add

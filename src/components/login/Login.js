@@ -36,7 +36,8 @@ function Login({ onLoginSuccess }) {
 
         if (onLoginSuccess) { onLoginSuccess(); }
 
-        const destino = funcaoAtual === "cozinha" ? "/produto-estoque" : "/inicio";
+        const destinos = { cozinha: "/produto-estoque", motoboy: "/configurar-rotas" };
+        const destino = destinos[funcaoAtual] || "/inicio";
         setTimeout(() => { navigate(destino); }, 200);
       } else {
         throw new Error("Dados de usuário inválidos");
