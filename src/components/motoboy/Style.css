@@ -83,3 +83,19 @@
 @keyframes cfg-in { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
 @media (max-width: 480px) { .cfg-linha { flex-direction: column; } .cfg-mapa { height: 50vh; } }
+
+/* ---- busca de endereço ---- */
+.cfg-busca { position: relative; margin-top: 8px; }
+.cfg-busca-campo { position: relative; }
+.cfg-busca-campo input { padding-right: 40px !important; }
+.cfg-busca-x { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; font-size: 1rem; color: #666; padding: 8px; cursor: pointer; }
+.cfg-sugestoes { position: absolute; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 0; list-style: none; background: #fff; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 8px 22px rgba(0,0,0,.18); z-index: 1200; max-height: 280px; overflow-y: auto; }
+.cfg-sugestoes li { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-bottom: 1px solid #f1f1f1; cursor: pointer; }
+.cfg-sugestoes li:last-child { border-bottom: 0; }
+.cfg-sugestoes li:hover, .cfg-sugestoes li:active { background: #fff5f5; }
+.cfg-sugestoes .pin { font-size: 1.1rem; }
+.cfg-sugestoes strong { display: block; font-size: .95rem; }
+.cfg-sugestoes small { color: #666; font-size: .8rem; }
+.cfg-busca-aviso { margin-top: 6px; font-size: .85rem; color: #8a6d00; }
+.cfg-busca-extras { margin-top: 8px; }
+.cfg-busca-extras label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; }

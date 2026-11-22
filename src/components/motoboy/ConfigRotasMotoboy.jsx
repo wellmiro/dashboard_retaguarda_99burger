@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Circle, Marker, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
-  getConfigMotoboy, salvarConfigMotoboy, criarZona, atualizarZona, excluirZona,
+  getConfigMotoboy, salvarConfigMotoboy, criarZona, atualizarZona, excluirZona, buscarEndereco,
 } from "../../api/Motoboy";
 import "./Style.css";
 
@@ -69,6 +69,107 @@ function Recentralizar({ centro }) {
   return null;
 }
 
+/* Ajusta o zoom para o círculo caber na tela (só se ele não estiver todo visível) */
+function AjustarVista({ foco }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!foco || !foco.ponto) return;
+    const [lat, lng] = foco.ponto;
+    const dLat = foco.raio / 111320;
+    const dLng = foco.raio / (111320 * Math.max(Math.cos((lat * Math.PI) / 180), 0.01));
+    const bounds = L.latLngBounds([lat - dLat, lng - dLng], [lat + dLat, lng + dLng]);
+    if (foco.forcar || !map.getBounds().contains(bounds)) {
+      map.fitBounds(bounds, { padding: [24, 24], maxZoom: 16 });
+    }
+  }, [foco, map]);
+  return null;
+}
+
+/* Busca de endereço com sugestões (estilo Uber/GPS) */
+function BuscaEndereco({ biasLat, biasLng, onEscolher, comExtras }) {
+  const [texto, setTexto] = useState("");
+  const [sugestoes, setSugestoes] = useState([]);
+  const [aberto, setAberto] = useState(false);
+  const [buscando, setBuscando] = useState(false);
+  const [aviso, setAviso] = useState("");
+  const [escolhido, setEscolhido] = useState(null);
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const reqId = useRef(0);
+
+  useEffect(() => {
+    const q = texto.trim();
+    if (q.length < 3 || escolhido) { setSugestoes([]); setAviso(""); return; }
+    const id = ++reqId.current;
+    const t = setTimeout(async () => {
+      try {
+        setBuscando(true);
+        setAviso("");
+        const { data } = await buscarEndereco(q, biasLat, biasLng);
+        if (id !== reqId.current) return;
+        setSugestoes(data || []);
+        setAberto(true);
+        if (!data || data.length === 0) setAviso("Nenhum endereço encontrado. Tente outro nome ou toque direto no mapa.");
+      } catch (e) {
+        if (id === reqId.current) setAviso("Busca indisponível agora. Toque direto no mapa.");
+      } finally {
+        if (id === reqId.current) setBuscando(false);
+      }
+    }, 500); // espera parar de digitar
+    return () => clearTimeout(t);
+  }, [texto, escolhido, biasLat, biasLng]);
+
+  const escolher = (sug) => {
+    setEscolhido(sug);
+    setTexto(sug.label);
+    setAberto(false);
+    setSugestoes([]);
+    onEscolher(sug);
+  };
+  const limpar = () => { setTexto(""); setEscolhido(null); setSugestoes([]); setAviso(""); setNumero(""); setComplemento(""); };
+
+  return (
+    <div className="cfg-busca">
+      <div className="cfg-busca-campo">
+        <input type="text" autoComplete="off" placeholder="🔎 Digite a rua ou o bairro…" value={texto}
+          onFocus={() => sugestoes.length && setAberto(true)}
+          onChange={(e) => { setEscolhido(null); setTexto(e.target.value); }} />
+        {(texto || buscando) && (
+          <button type="button" className="cfg-busca-x" onClick={limpar} aria-label="Limpar">
+            {buscando ? "…" : "✕"}
+          </button>
+        )}
+      </div>
+
+      {aberto && sugestoes.length > 0 && (
+        <ul className="cfg-sugestoes">
+          {sugestoes.map((sug, i) => (
+            <li key={i} onClick={() => escolher(sug)}>
+              <span className="pin">📍</span>
+              <div>
+                <strong>{sug.principal}</strong>
+                {sug.secundario && <small>{sug.secundario}</small>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {aviso && <div className="cfg-busca-aviso">{aviso}</div>}
+
+      {comExtras && escolhido && (
+        <div className="cfg-linha cfg-busca-extras">
+          <label>Número
+            <input type="text" inputMode="numeric" maxLength={10} placeholder="123" value={numero} onChange={(e) => setNumero(e.target.value)} />
+          </label>
+          <label>Complemento
+            <input type="text" maxLength={40} placeholder="Apto, bloco, referência…" value={complemento} onChange={(e) => setComplemento(e.target.value)} />
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ConfigRotasMotoboy() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -84,6 +185,7 @@ export default function ConfigRotasMotoboy() {
   const [modoTeste, setModoTeste] = useState(false);
   const [pontoTeste, setPontoTeste] = useState(null);
   const [dicasAbertas, setDicasAbertas] = useState(false);
+  const [foco, setFoco] = useState(null); // {ponto, raio, forcar} -> ajusta zoom do mapa
 
   const mostrarToast = useCallback((msg, tipo = "ok") => {
     setToast({ msg, tipo });
@@ -146,6 +248,14 @@ export default function ConfigRotasMotoboy() {
     if (modoTeste) return setPontoTeste(ponto);
     if (!cfg.usa_zonas) return;
     setRascunho((r) => ({ ...r, ponto }));
+    setFoco({ ponto, raio: rascunho.raio, forcar: false });
+  };
+
+  const escolherEndereco = (sug) => {
+    const ponto = [sug.lat, sug.lng];
+    if (modoTeste) { setPontoTeste(ponto); setFoco({ ponto, raio: 400, forcar: true }); return; }
+    setRascunho((r) => ({ ...r, ponto, nome: r.nome || sug.bairro || "" }));
+    setFoco({ ponto, raio: rascunho.raio, forcar: true });
   };
 
   const salvarZona = async () => {
@@ -180,6 +290,7 @@ export default function ConfigRotasMotoboy() {
       ponto: [Number(z.latitude), Number(z.longitude)],
       raio: z.raio_metros, valor: String(z.valor), nome: z.nome_zona || "",
     });
+    setFoco({ ponto: [Number(z.latitude), Number(z.longitude)], raio: z.raio_metros, forcar: true });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -239,7 +350,7 @@ export default function ConfigRotasMotoboy() {
         </button>
         {dicasAbertas && (
           <ul className="cfg-dicas">
-            <li>Toque no mapa para marcar o centro do bairro; use o controle de raio para cobrir a região.</li>
+            <li>Busque o endereço/bairro ou toque no mapa para marcar o centro; arraste o pino 📍 para ajustar.</li>
             <li>Use dois dedos para dar zoom e um dedo para arrastar o mapa.</li>
             <li>Zonas menores dentro de zonas maiores têm prioridade (ex: "Centro" dentro de "Cidade").</li>
             <li>Use "Testar endereço" para conferir quanto você ganharia antes de salvar.</li>
@@ -318,11 +429,15 @@ export default function ConfigRotasMotoboy() {
             </button>
           </div>
 
+          <BuscaEndereco key={modoTeste ? "teste" : "zona"} biasLat={loja.centro[0]} biasLng={loja.centro[1]}
+            onEscolher={escolherEndereco} comExtras={modoTeste} />
+
           <div className="cfg-mapa">
             <MapContainer center={loja.centro} zoom={13} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
               <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <Recentralizar centro={loja.centro} />
               <MapClicks onClick={aoClicarMapa} />
+              <AjustarVista foco={foco} />
 
               <Marker position={loja.centro} icon={iconeLoja}>
                 <Tooltip direction="top" offset={[0, -34]}>{loja.nome}</Tooltip>
@@ -339,6 +454,18 @@ export default function ConfigRotasMotoboy() {
               {cfg.usa_zonas && !modoTeste && rascunho.ponto && (
                 <Circle center={rascunho.ponto} radius={rascunho.raio}
                   pathOptions={{ color: sobreposicoes.length ? "#d00000" : "#111", dashArray: "6 6", fillOpacity: 0.12, weight: 2 }} />
+              )}
+
+              {cfg.usa_zonas && !modoTeste && rascunho.ponto && (
+                <Marker position={rascunho.ponto} icon={iconeTeste} draggable
+                  eventHandlers={{
+                    dragend: (e) => {
+                      const p = e.target.getLatLng();
+                      setRascunho((r) => ({ ...r, ponto: [p.lat, p.lng] }));
+                    },
+                  }}>
+                  <Tooltip direction="top" offset={[0, -30]}>Centro da zona (arraste para ajustar)</Tooltip>
+                </Marker>
               )}
 
               {pontoTeste && <Marker position={pontoTeste} icon={iconeTeste} />}
@@ -363,7 +490,8 @@ export default function ConfigRotasMotoboy() {
               <label>
                 Raio: <b>{rascunho.raio >= 1000 ? (rascunho.raio / 1000).toFixed(1).replace(".", ",") + " km" : rascunho.raio + " m"}</b>
                 <input type="range" min={RAIO_MIN} max={RAIO_MAX} step={100} value={rascunho.raio}
-                  onChange={(e) => setRascunho((r) => ({ ...r, raio: Number(e.target.value) }))} />
+                  onChange={(e) => setRascunho((r) => ({ ...r, raio: Number(e.target.value) }))}
+                  onPointerUp={() => rascunho.ponto && setFoco({ ponto: rascunho.ponto, raio: rascunho.raio, forcar: false })} />
               </label>
 
               <div className="cfg-linha">
